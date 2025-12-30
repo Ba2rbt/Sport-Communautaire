@@ -20,11 +20,13 @@ main (production)
 ### Branch name pattern: `main`
 
 - [x] **Require a pull request before merging**
+
   - [x] Require approvals: `1`
   - [x] Dismiss stale pull request approvals when new commits are pushed
   - [x] Require review from Code Owners
 
 - [x] **Require status checks to pass before merging**
+
   - [x] Require branches to be up to date before merging
   - Status checks requis:
     - `🔍 Lint`
@@ -43,9 +45,11 @@ main (production)
 ### Branch name pattern: `develop`
 
 - [x] **Require a pull request before merging**
+
   - [x] Require approvals: `1`
 
 - [x] **Require status checks to pass before merging**
+
   - Status checks requis:
     - `🔍 Lint`
     - `📝 Type Check`
@@ -56,6 +60,7 @@ main (production)
 ## 📋 Workflow de développement
 
 1. **Créer une branche feature** depuis `develop`:
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -63,18 +68,22 @@ main (production)
    ```
 
 2. **Développer et commiter** (Conventional Commits):
+
    ```bash
    git add .
    git commit -m "feat: ajouter le composant CardMatch"
    ```
 
 3. **Pousser et créer une PR** vers `develop`:
+
    ```bash
    git push origin feature/ma-fonctionnalite
    ```
+
    → Créer PR vers `develop` sur GitHub
 
 4. **Après review et merge dans `develop`**:
+
    - Le déploiement preview s'effectue automatiquement
 
 5. **Release vers production**:
@@ -83,15 +92,15 @@ main (production)
 
 ## 🏷️ Conventions de nommage
 
-| Préfixe | Usage |
-|---------|-------|
-| `feature/` | Nouvelle fonctionnalité |
-| `fix/` | Correction de bug |
-| `docs/` | Documentation |
-| `refactor/` | Refactoring de code |
-| `style/` | Changements de style (CSS, formatage) |
-| `test/` | Ajout ou modification de tests |
-| `chore/` | Tâches de maintenance |
+| Préfixe     | Usage                                 |
+| ----------- | ------------------------------------- |
+| `feature/`  | Nouvelle fonctionnalité               |
+| `fix/`      | Correction de bug                     |
+| `docs/`     | Documentation                         |
+| `refactor/` | Refactoring de code                   |
+| `style/`    | Changements de style (CSS, formatage) |
+| `test/`     | Ajout ou modification de tests        |
+| `chore/`    | Tâches de maintenance                 |
 
 ## 🔄 Exemple de flux complet
 

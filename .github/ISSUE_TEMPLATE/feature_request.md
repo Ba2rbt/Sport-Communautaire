@@ -1,9 +1,9 @@
 ---
 name: ✨ Feature Request
 about: Proposer une nouvelle fonctionnalité pour la plateforme
-title: '[FEATURE] '
+title: "[FEATURE] "
 labels: enhancement, triage
-assignees: ''
+assignees: ""
 ---
 
 ## 🎯 Résumé de la fonctionnalité

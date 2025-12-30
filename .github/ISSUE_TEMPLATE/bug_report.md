@@ -1,9 +1,9 @@
 ---
 name: 🐛 Bug Report
 about: Signaler un bug pour nous aider à améliorer la plateforme
-title: '[BUG] '
+title: "[BUG] "
 labels: bug, triage
-assignees: ''
+assignees: ""
 ---
 
 ## 🐛 Description du Bug

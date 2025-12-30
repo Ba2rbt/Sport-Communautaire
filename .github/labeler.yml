@@ -4,65 +4,65 @@
 # Frontend components
 frontend:
   - changed-files:
-    - any-glob-to-any-file:
-      - 'src/components/**/*'
-      - 'src/app/**/*'
+      - any-glob-to-any-file:
+          - "src/components/**/*"
+          - "src/app/**/*"
 
 # Styles
 styles:
   - changed-files:
-    - any-glob-to-any-file:
-      - '**/*.css'
-      - 'tailwind.config.*'
+      - any-glob-to-any-file:
+          - "**/*.css"
+          - "tailwind.config.*"
 
 # Documentation
 documentation:
   - changed-files:
-    - any-glob-to-any-file:
-      - '**/*.md'
-      - 'docs/**/*'
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**/*"
 
 # Tests
 tests:
   - changed-files:
-    - any-glob-to-any-file:
-      - '**/*.test.*'
-      - '**/*.spec.*'
-      - '__tests__/**/*'
+      - any-glob-to-any-file:
+          - "**/*.test.*"
+          - "**/*.spec.*"
+          - "__tests__/**/*"
 
 # Configuration
 config:
   - changed-files:
-    - any-glob-to-any-file:
-      - '*.config.*'
-      - '.env*'
-      - 'tsconfig.json'
-      - 'package.json'
+      - any-glob-to-any-file:
+          - "*.config.*"
+          - ".env*"
+          - "tsconfig.json"
+          - "package.json"
 
 # CI/CD
 ci-cd:
   - changed-files:
-    - any-glob-to-any-file:
-      - '.github/**/*'
+      - any-glob-to-any-file:
+          - ".github/**/*"
 
 # Database
 database:
   - changed-files:
-    - any-glob-to-any-file:
-      - 'supabase/**/*'
-      - '**/migrations/**/*'
+      - any-glob-to-any-file:
+          - "supabase/**/*"
+          - "**/migrations/**/*"
 
 # i18n
 i18n:
   - changed-files:
-    - any-glob-to-any-file:
-      - 'locales/**/*'
-      - 'src/locales/**/*'
-      - '**/i18n/**/*'
+      - any-glob-to-any-file:
+          - "locales/**/*"
+          - "src/locales/**/*"
+          - "**/i18n/**/*"
 
 # API
 api:
   - changed-files:
-    - any-glob-to-any-file:
-      - 'src/app/api/**/*'
-      - 'src/lib/api/**/*'
+      - any-glob-to-any-file:
+          - "src/app/api/**/*"
+          - "src/lib/api/**/*"
