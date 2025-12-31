@@ -1,0 +1,113 @@
+{
+  "common": {
+    "appName": "Sport Communautaire",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "seeMore": "Voir plus",
+    "seeAll": "Voir tout",
+    "back": "Retour"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "matches": "Matchs",
+    "competitions": "Compétitions",
+    "community": "Communauté",
+    "experts": "Zone Expert",
+    "fanZones": "Fan Zones",
+    "profile": "Mon Profil",
+    "login": "Connexion",
+    "register": "Inscription",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "hero": {
+      "title": "La plateforme sport communautaire",
+      "subtitle": "Suivez vos matchs, votez pour le MVP, rejoignez la communauté",
+      "cta": "Découvrir"
+    },
+    "sections": {
+      "liveMatches": "Matchs en direct",
+      "upcomingMatches": "Matchs à venir",
+      "topMVP": "Top MVP",
+      "latestArticles": "Articles récents",
+      "trending": "Tendances"
+    }
+  },
+  "matches": {
+    "title": "Matchs",
+    "live": "En direct",
+    "upcoming": "À venir",
+    "finished": "Terminé",
+    "noMatches": "Aucun match disponible",
+    "filters": {
+      "sport": "Sport",
+      "competition": "Compétition",
+      "date": "Date",
+      "all": "Tous"
+    }
+  },
+  "sports": {
+    "football": "Football",
+    "basketball": "Basket",
+    "mma": "MMA"
+  },
+  "mvp": {
+    "title": "Vote MVP",
+    "voteButton": "Voter",
+    "voted": "Voté",
+    "votes": "votes",
+    "ranking": "Classement MVP",
+    "matchMvp": "MVP du match",
+    "seasonMvp": "MVP de la saison"
+  },
+  "community": {
+    "title": "Communauté",
+    "newThread": "Nouveau sujet",
+    "reply": "Répondre",
+    "replies": "réponses",
+    "noThreads": "Aucune discussion"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?"
+    },
+    "register": {
+      "title": "Inscription",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "S'inscrire",
+      "hasAccount": "Déjà un compte ?"
+    }
+  },
+  "profile": {
+    "title": "Mon Profil",
+    "favorites": "Favoris",
+    "voteHistory": "Historique des votes",
+    "badges": "Badges",
+    "settings": "Paramètres",
+    "language": "Langue"
+  },
+  "footer": {
+    "description": "Plateforme communautaire multisport gratuite",
+    "links": {
+      "about": "À propos",
+      "contact": "Contact",
+      "privacy": "Confidentialité",
+      "terms": "CGU"
+    },
+    "copyright": "© 2025 Sport Communautaire. Tous droits réservés."
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "common": {
+    "appName": "Sport Community",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "seeMore": "See more",
+    "seeAll": "See all",
+    "back": "Back"
+  },
+  "navigation": {
+    "home": "Home",
+    "matches": "Matches",
+    "competitions": "Competitions",
+    "community": "Community",
+    "experts": "Expert Zone",
+    "fanZones": "Fan Zones",
+    "profile": "My Profile",
+    "login": "Login",
+    "register": "Sign up",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "The community sport platform",
+      "subtitle": "Follow your matches, vote for the MVP, join the community",
+      "cta": "Discover"
+    },
+    "sections": {
+      "liveMatches": "Live Matches",
+      "upcomingMatches": "Upcoming Matches",
+      "topMVP": "Top MVP",
+      "latestArticles": "Latest Articles",
+      "trending": "Trending"
+    }
+  },
+  "matches": {
+    "title": "Matches",
+    "live": "Live",
+    "upcoming": "Upcoming",
+    "finished": "Finished",
+    "noMatches": "No matches available",
+    "filters": {
+      "sport": "Sport",
+      "competition": "Competition",
+      "date": "Date",
+      "all": "All"
+    }
+  },
+  "sports": {
+    "football": "Football",
+    "basketball": "Basketball",
+    "mma": "MMA"
+  },
+  "mvp": {
+    "title": "MVP Vote",
+    "voteButton": "Vote",
+    "voted": "Voted",
+    "votes": "votes",
+    "ranking": "MVP Ranking",
+    "matchMvp": "Match MVP",
+    "seasonMvp": "Season MVP"
+  },
+  "community": {
+    "title": "Community",
+    "newThread": "New thread",
+    "reply": "Reply",
+    "replies": "replies",
+    "noThreads": "No discussions"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?"
+    },
+    "register": {
+      "title": "Sign up",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "favorites": "Favorites",
+    "voteHistory": "Vote History",
+    "badges": "Badges",
+    "settings": "Settings",
+    "language": "Language"
+  },
+  "footer": {
+    "description": "Free community multisport platform",
+    "links": {
+      "about": "About",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "copyright": "© 2025 Sport Community. All rights reserved."
+  }
+}
