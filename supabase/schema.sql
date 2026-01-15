@@ -220,3 +220,70 @@ CREATE INDEX IF NOT EXISTS idx_matches_date ON public.matches(match_date);
 CREATE INDEX IF NOT EXISTS idx_matches_status ON public.matches(status);
 CREATE INDEX IF NOT EXISTS idx_matches_league ON public.matches(league_id);
 CREATE INDEX IF NOT EXISTS idx_teams_league ON public.teams(league_id);
+-- =============================================================================
+-- COMPETITIONS TABLE (Enhanced)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.competitions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  short_name TEXT,
+  logo TEXT,
+  country TEXT,
+  description TEXT,
+  season TEXT NOT NULL,
+  start_date DATE,
+  end_date DATE,
+  total_teams INTEGER DEFAULT 0,
+  total_matches INTEGER DEFAULT 0,
+  total_goals INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.competitions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Competitions are viewable by everyone"
+  ON public.competitions FOR SELECT USING (true);
+
+DROP TRIGGER IF EXISTS update_competitions_updated_at ON public.competitions;
+CREATE TRIGGER update_competitions_updated_at
+  BEFORE UPDATE ON public.competitions
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =============================================================================
+-- STANDINGS TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.standings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  competition_id UUID REFERENCES public.competitions(id) ON DELETE CASCADE NOT NULL,
+  team_id UUID REFERENCES public.teams(id) ON DELETE CASCADE NOT NULL,
+  position INTEGER NOT NULL,
+  played INTEGER DEFAULT 0,
+  won INTEGER DEFAULT 0,
+  drawn INTEGER DEFAULT 0,
+  lost INTEGER DEFAULT 0,
+  goals_for INTEGER DEFAULT 0,
+  goals_against INTEGER DEFAULT 0,
+  goal_difference INTEGER GENERATED ALWAYS AS (goals_for - goals_against) STORED,
+  points INTEGER DEFAULT 0,
+  form TEXT, -- Last 5 results: 'WDWLW'
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  UNIQUE(competition_id, team_id)
+);
+
+ALTER TABLE public.standings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Standings are viewable by everyone"
+  ON public.standings FOR SELECT USING (true);
+
+DROP TRIGGER IF EXISTS update_standings_updated_at ON public.standings;
+CREATE TRIGGER update_standings_updated_at
+  BEFORE UPDATE ON public.standings
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_standings_competition ON public.standings(competition_id);
+CREATE INDEX IF NOT EXISTS idx_standings_position ON public.standings(position);
+CREATE INDEX IF NOT EXISTS idx_competitions_active ON public.competitions(is_active);
