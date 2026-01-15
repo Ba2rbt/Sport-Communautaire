@@ -4,6 +4,7 @@
 -- =============================================================================
 -- PROFILES TABLE
 -- =============================================================================
+-- Create profiles table to store user profile data
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT NOT NULL,
@@ -13,23 +14,31 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
+-- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- Profiles policies
 CREATE POLICY "Public profiles are viewable by everyone"
-  ON public.profiles FOR SELECT USING (true);
+  ON public.profiles
+  FOR SELECT
+  USING (true);
 
 CREATE POLICY "Users can insert their own profile"
-  ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+  ON public.profiles
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+  ON public.profiles
+  FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- =============================================================================
 -- TRIGGER: Auto-create profile on user signup
 -- =============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS \$\$
+RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, full_name, avatar_url)
   VALUES (
@@ -40,8 +49,9 @@ BEGIN
   );
   RETURN NEW;
 END;
-\$\$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Trigger to create profile on signup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -51,12 +61,70 @@ CREATE TRIGGER on_auth_user_created
 -- TRIGGER: Update updated_at timestamp
 -- =============================================================================
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
-RETURNS TRIGGER AS \$\$
+RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-\$\$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
+CREATE TRIGGER update_profiles_updated_at
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =============================================================================
+-- ANALYSES TABLE (for expert analyses)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.analyses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  author_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  category TEXT NOT NULL,
+  image_url TEXT,
+  is_published BOOLEAN DEFAULT false,
+  read_time TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;
+
+-- Analyses policies
+CREATE POLICY "Published analyses are viewable by everyone"
+  ON public.analyses
+  FOR SELECT
+  USING (is_published = true);
+
+CREATE POLICY "Users can view their own analyses"
+  ON public.analyses
+  FOR SELECT
+  USING (auth.uid() = author_id);
+
+CREATE POLICY "Users can insert their own analyses"
+  ON public.analyses
+  FOR INSERT
+  WITH CHECK (auth.uid() = author_id);
+
+CREATE POLICY "Users can update their own analyses"
+  ON public.analyses
+  FOR UPDATE
+  USING (auth.uid() = author_id)
+  WITH CHECK (auth.uid() = author_id);
+
+CREATE POLICY "Users can delete their own analyses"
+  ON public.analyses
+  FOR DELETE
+  USING (auth.uid() = author_id);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_analyses_updated_at ON public.analyses;
+CREATE TRIGGER update_analyses_updated_at
+  BEFORE UPDATE ON public.analyses
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =============================================================================
 -- LEAGUES TABLE
@@ -71,6 +139,7 @@ CREATE TABLE IF NOT EXISTS public.leagues (
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
+-- Enable RLS
 ALTER TABLE public.leagues ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Leagues are viewable by everyone"
@@ -91,6 +160,7 @@ CREATE TABLE IF NOT EXISTS public.teams (
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
+-- Enable RLS
 ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Teams are viewable by everyone"
@@ -115,45 +185,29 @@ CREATE TABLE IF NOT EXISTS public.matches (
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
+-- Enable RLS
 ALTER TABLE public.matches ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Matches are viewable by everyone"
   ON public.matches FOR SELECT USING (true);
 
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_matches_updated_at ON public.matches;
+CREATE TRIGGER update_matches_updated_at
+  BEFORE UPDATE ON public.matches
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 -- =============================================================================
--- ANALYSES TABLE
+-- SEED DATA: Leagues
 -- =============================================================================
-CREATE TABLE IF NOT EXISTS public.analyses (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  author_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  title TEXT NOT NULL,
-  excerpt TEXT,
-  content TEXT NOT NULL,
-  category TEXT NOT NULL,
-  image_url TEXT,
-  is_published BOOLEAN DEFAULT false,
-  read_time TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
-ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Published analyses are viewable by everyone"
-  ON public.analyses FOR SELECT USING (is_published = true);
-
-CREATE POLICY "Users can view their own analyses"
-  ON public.analyses FOR SELECT USING (auth.uid() = author_id);
-
-CREATE POLICY "Users can insert their own analyses"
-  ON public.analyses FOR INSERT WITH CHECK (auth.uid() = author_id);
-
-CREATE POLICY "Users can update their own analyses"
-  ON public.analyses FOR UPDATE
-  USING (auth.uid() = author_id) WITH CHECK (auth.uid() = author_id);
-
-CREATE POLICY "Users can delete their own analyses"
-  ON public.analyses FOR DELETE USING (auth.uid() = author_id);
+INSERT INTO public.leagues (name, short_name, country, sport) VALUES
+  ('Ligue 1', 'L1', 'France', 'football'),
+  ('Premier League', 'PL', 'England', 'football'),
+  ('La Liga', 'LL', 'Spain', 'football'),
+  ('Serie A', 'SA', 'Italy', 'football'),
+  ('Bundesliga', 'BL', 'Germany', 'football'),
+  ('Champions League', 'UCL', 'Europe', 'football')
+ON CONFLICT DO NOTHING;
 
 -- =============================================================================
 -- INDEXES
