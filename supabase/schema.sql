@@ -287,3 +287,43 @@ CREATE TRIGGER update_standings_updated_at
 CREATE INDEX IF NOT EXISTS idx_standings_competition ON public.standings(competition_id);
 CREATE INDEX IF NOT EXISTS idx_standings_position ON public.standings(position);
 CREATE INDEX IF NOT EXISTS idx_competitions_active ON public.competitions(is_active);
+
+-- =============================================================================
+-- FAN ZONES TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.fan_zones (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  address TEXT,
+  lat DECIMAL(10, 8) NOT NULL,
+  lng DECIMAL(11, 8) NOT NULL,
+  team_id UUID REFERENCES public.teams(id) ON DELETE SET NULL,
+  team_name TEXT,
+  team_logo TEXT,
+  description TEXT,
+  capacity INTEGER,
+  amenities TEXT[], -- e.g. ['screen', 'bar', 'food', 'terrace']
+  opening_hours TEXT,
+  image_url TEXT,
+  is_verified BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.fan_zones ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Fan zones are viewable by everyone"
+  ON public.fan_zones FOR SELECT USING (is_active = true);
+
+DROP TRIGGER IF EXISTS update_fan_zones_updated_at ON public.fan_zones;
+CREATE TRIGGER update_fan_zones_updated_at
+  BEFORE UPDATE ON public.fan_zones
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_fan_zones_city ON public.fan_zones(city);
+CREATE INDEX IF NOT EXISTS idx_fan_zones_team ON public.fan_zones(team_id);
+CREATE INDEX IF NOT EXISTS idx_fan_zones_location ON public.fan_zones(lat, lng);
+CREATE INDEX IF NOT EXISTS idx_fan_zones_active ON public.fan_zones(is_active);
