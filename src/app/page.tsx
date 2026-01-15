@@ -1,8 +1,9 @@
-import HeroMatch from '@/components/HeroMatch';
-import MatchCard from '@/components/MatchCard';
-import MVPCard from '@/components/MVPCard';
-import ExpertCard from '@/components/ExpertCard';
-import type { Match, MVP, Analysis } from '@/types';
+import HeroMatch from '@/components/HeroMatch'
+import MatchCard from '@/components/MatchCard'
+import MVPCard from '@/components/MVPCard'
+import ExpertCard from '@/components/ExpertCard'
+import { PrimaryButton, SecondaryButton, TagLigue, TableStats, RankCell, PlayerCell, StatCell } from '@/components/ui'
+import type { Match, MVP, Analysis } from '@/types'
 
 // Mock Data - Match du jour
 const featuredMatch: Match = {
@@ -25,7 +26,7 @@ const featuredMatch: Match = {
   venue: 'Parc des Princes, Paris',
   isLive: true,
   status: 'live',
-};
+}
 
 // Mock Data - Matches à venir
 const upcomingMatches: Match[] = [
@@ -86,7 +87,7 @@ const upcomingMatches: Match[] = [
     isLive: false,
     status: 'upcoming',
   },
-];
+]
 
 // Mock Data - Top MVP
 const topMVPs: MVP[] = [
@@ -126,7 +127,7 @@ const topMVPs: MVP[] = [
     image: '💫',
     rating: 8.8,
   },
-];
+]
 
 // Mock Data - Analyses experts
 const expertAnalyses: Analysis[] = [
@@ -175,16 +176,42 @@ const expertAnalyses: Analysis[] = [
     image: '🏆',
     date: '11 Jan 2026',
   },
-];
+]
+
+// Mock Data - Stats Table
+const topScorers = [
+  { rank: 1, name: 'Erling Haaland', team: 'Manchester City', avatar: '🎯', goals: 22, assists: 5, matches: 18 },
+  { rank: 2, name: 'Kylian Mbappé', team: 'Real Madrid', avatar: '⚡', goals: 18, assists: 8, matches: 17 },
+  { rank: 3, name: 'Harry Kane', team: 'Bayern Munich', avatar: '🦁', goals: 17, assists: 7, matches: 18 },
+  { rank: 4, name: 'Viktor Gyökeres', team: 'Sporting CP', avatar: '🇸🇪', goals: 16, assists: 4, matches: 16 },
+  { rank: 5, name: 'Mohamed Salah', team: 'Liverpool', avatar: '👑', goals: 15, assists: 10, matches: 18 },
+]
+
+// Leagues for filter tags
+const leagues = ['Ligue 1', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga']
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-secondary">
-      {/* Hero - Match du jour */}
+      {/* Hero - Match du jour (Full Width) */}
       <HeroMatch match={featuredMatch} />
 
+      {/* League Tags Filter */}
+      <section className="bg-white border-b border-editorial">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <span className="text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">
+              Compétitions :
+            </span>
+            {leagues.map((league, index) => (
+              <TagLigue key={league} league={league} isActive={index === 0} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Section: Matches à venir */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex items-end justify-between mb-10">
           <div>
             <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
@@ -194,15 +221,16 @@ export default function Home() {
               Matches à venir
             </h2>
           </div>
-          <a
-            href="/matches"
-            className="hidden md:flex items-center gap-2 text-sm font-medium text-accent-sport hover:text-accent-sport/80 transition-colors"
+          <SecondaryButton
+            size="sm"
+            rightIcon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            }
           >
             Voir tout
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
+          </SecondaryButton>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -213,8 +241,8 @@ export default function Home() {
       </section>
 
       {/* Section: Top MVP */}
-      <section className="bg-gradient-to-b from-secondary to-white">
-        <div className="max-w-6xl mx-auto px-6 py-16">
+      <section className="bg-gradient-to-b from-secondary via-white to-white">
+        <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="flex items-end justify-between mb-10">
             <div>
               <span className="text-xs font-semibold tracking-widest uppercase text-accent-mvp mb-2 block">
@@ -224,15 +252,16 @@ export default function Home() {
                 Top MVP de la semaine
               </h2>
             </div>
-            <a
-              href="/mvp"
-              className="hidden md:flex items-center gap-2 text-sm font-medium text-accent-mvp hover:text-accent-mvp/80 transition-colors"
+            <SecondaryButton
+              size="sm"
+              rightIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              }
             >
               Classement complet
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
+            </SecondaryButton>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -243,9 +272,106 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section: Analyses experts */}
+      {/* Section: Stats Table */}
       <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-16">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Table */}
+            <div className="lg:col-span-2">
+              <TableStats
+                title="Meilleurs buteurs"
+                subtitle="Classement"
+                data={topScorers}
+                highlightFirst={3}
+                columns={[
+                  {
+                    key: 'rank',
+                    header: '#',
+                    width: '60px',
+                    align: 'center',
+                    render: (item) => <RankCell rank={item.rank} />,
+                  },
+                  {
+                    key: 'name',
+                    header: 'Joueur',
+                    render: (item) => (
+                      <PlayerCell name={item.name} team={item.team} avatar={item.avatar} />
+                    ),
+                  },
+                  {
+                    key: 'goals',
+                    header: 'Buts',
+                    align: 'center',
+                    render: (item) => (
+                      <span className="font-bold text-accent-live">{item.goals}</span>
+                    ),
+                  },
+                  {
+                    key: 'assists',
+                    header: 'Passes',
+                    align: 'center',
+                    render: (item) => <StatCell value={item.assists} />,
+                  },
+                  {
+                    key: 'matches',
+                    header: 'MJ',
+                    align: 'center',
+                  },
+                ]}
+              />
+            </div>
+
+            {/* Quick Stats Card */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-primary to-primary/90 text-white rounded-lg p-6">
+                <span className="text-xs font-semibold tracking-widest uppercase text-accent-live mb-2 block">
+                  Cette semaine
+                </span>
+                <h3 className="font-editorial text-2xl font-bold mb-6">Stats clés</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                    <span className="text-white/70">Matches joués</span>
+                    <span className="font-bold text-xl">47</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                    <span className="text-white/70">Buts marqués</span>
+                    <span className="font-bold text-xl">128</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                    <span className="text-white/70">Cartons rouges</span>
+                    <span className="font-bold text-xl">5</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/70">Moyenne buts/match</span>
+                    <span className="font-bold text-xl text-accent-live">2.72</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white border border-editorial rounded-lg p-6">
+                <h4 className="font-semibold text-primary mb-4">Prochains gros matchs</h4>
+                <div className="space-y-3">
+                  {[
+                    { home: '🔴 FCB', away: 'RMA ⚪', time: '21:00' },
+                    { home: '🩵 MCI', away: 'LIV 🔴', time: '18:30' },
+                  ].map((m, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm p-3 bg-secondary/50 rounded-lg">
+                      <span className="font-medium">{m.home}</span>
+                      <span className="text-muted">vs</span>
+                      <span className="font-medium">{m.away}</span>
+                      <span className="text-accent-sport font-semibold">{m.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section: Analyses experts */}
+      <section className="bg-secondary">
+        <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="flex items-end justify-between mb-10">
             <div>
               <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
@@ -255,15 +381,16 @@ export default function Home() {
                 Analyses d&apos;experts
               </h2>
             </div>
-            <a
-              href="/experts"
-              className="hidden md:flex items-center gap-2 text-sm font-medium text-accent-sport hover:text-accent-sport/80 transition-colors"
+            <SecondaryButton
+              size="sm"
+              rightIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              }
             >
               Toutes les analyses
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
+            </SecondaryButton>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -275,24 +402,33 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary text-secondary">
-        <div className="max-w-6xl mx-auto px-6 py-20 text-center">
-          <h2 className="font-editorial text-3xl md:text-5xl font-bold mb-6">
+      <section className="relative bg-primary text-secondary overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-accent-sport/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-live/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 py-24 text-center">
+          <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-4 block">
+            Rejoignez-nous
+          </span>
+          <h2 className="font-editorial text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Rejoignez la communauté
           </h2>
           <p className="text-muted text-lg max-w-2xl mx-auto mb-10">
             Partagez votre passion, débattez avec d&apos;autres fans et accédez à du contenu exclusif.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-accent-sport hover:bg-accent-sport/90 text-white font-semibold rounded-full transition-colors">
+            <PrimaryButton size="lg">
               Créer un compte
-            </button>
-            <button className="px-8 py-4 bg-transparent border-2 border-secondary/30 hover:border-secondary text-secondary font-semibold rounded-full transition-colors">
+            </PrimaryButton>
+            <SecondaryButton size="lg" className="border-white/30 text-white hover:bg-white/10">
               En savoir plus
-            </button>
+            </SecondaryButton>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }

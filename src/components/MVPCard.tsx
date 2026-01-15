@@ -1,52 +1,73 @@
-import type { MVP } from '@/types';
+import type { MVP } from '@/types'
+import { BadgeMVP } from './ui'
 
 interface MVPCardProps {
-  mvp: MVP;
-  rank: number;
+  mvp: MVP
+  rank: number
 }
 
 export default function MVPCard({ mvp, rank }: MVPCardProps) {
   return (
     <article className="group relative bg-white border border-editorial rounded-lg overflow-hidden hover-lift cursor-pointer">
-      {/* Rank Badge */}
+      {/* Rank Badge - Top Left */}
       <div className="absolute top-4 left-4 z-10">
-        <span className="flex items-center justify-center w-8 h-8 bg-accent-mvp text-white font-bold text-sm rounded-full shadow-lg">
+        <span className={`
+          flex items-center justify-center w-10 h-10 rounded-full font-bold text-base shadow-lg
+          ${rank === 1 
+            ? 'bg-accent-mvp text-white shadow-accent-mvp/40' 
+            : rank === 2 
+            ? 'bg-gray-400 text-white' 
+            : rank === 3 
+            ? 'bg-amber-600 text-white' 
+            : 'bg-primary/10 text-primary'
+          }
+        `}>
           {rank}
         </span>
       </div>
 
-      {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-primary/5 to-accent-sport/10 flex items-center justify-center">
-        <span className="text-6xl">{mvp.image}</span>
-        {/* MVP Badge */}
-        <div className="absolute bottom-0 right-0 bg-accent-mvp text-white px-3 py-1 text-xs font-bold tracking-wider">
-          MVP
+      {/* Image Area */}
+      <div className="relative h-52 bg-gradient-to-br from-primary/5 via-accent-sport/5 to-accent-mvp/10 flex items-center justify-center overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-accent-mvp/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-sport/20 rounded-full blur-2xl" />
+        </div>
+        
+        {/* Avatar */}
+        <span className="relative text-7xl transition-transform duration-500 group-hover:scale-110">
+          {mvp.image}
+        </span>
+        
+        {/* MVP Badge - Bottom Right */}
+        <div className="absolute bottom-3 right-3">
+          <BadgeMVP rating={mvp.rating} size="sm" />
         </div>
       </div>
 
       {/* Content */}
       <div className="p-5">
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <h3 className="font-editorial text-lg font-bold text-primary group-hover:text-accent-sport transition-colors">
-              {mvp.name}
-            </h3>
-            <p className="text-sm text-muted">{mvp.team}</p>
-          </div>
-          <div className="flex items-center gap-1 bg-accent-mvp/10 px-2 py-1 rounded">
-            <svg className="w-4 h-4 text-accent-mvp" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            <span className="text-sm font-bold text-accent-mvp">{mvp.rating}</span>
-          </div>
+        <div className="mb-3">
+          <h3 className="font-editorial text-xl font-bold text-primary group-hover:text-accent-sport transition-colors">
+            {mvp.name}
+          </h3>
+          <p className="text-sm text-muted mt-1">{mvp.team}</p>
         </div>
 
-        <p className="text-xs text-muted uppercase tracking-wider mb-3">{mvp.position}</p>
+        <p className="text-xs text-accent-sport font-semibold uppercase tracking-widest mb-4">
+          {mvp.position}
+        </p>
         
-        <div className="pt-3 border-t border-editorial">
-          <p className="text-sm text-primary font-medium">{mvp.stats}</p>
+        {/* Stats */}
+        <div className="pt-4 border-t border-editorial">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-accent-live" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <p className="text-sm font-medium text-primary">{mvp.stats}</p>
+          </div>
         </div>
       </div>
     </article>
-  );
+  )
 }
