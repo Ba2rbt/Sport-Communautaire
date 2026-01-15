@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f9fa;
+  --foreground: #0a0a0a;
+  --primary: #0a0a0a;
+  --secondary: #f8f9fa;
+  --accent-live: #00b140;
+  --accent-mvp: #ff6200;
+  --accent-sport: #0066cc;
+  --muted: #666666;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent-live: var(--accent-live);
+  --color-accent-mvp: var(--accent-mvp);
+  --color-accent-sport: var(--accent-sport);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-source-sans), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+/* NYTimes-style editorial typography */
+.font-editorial {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* Live pulse animation */
+@keyframes pulse-live {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-live {
+  animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Subtle hover transitions */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* NYTimes border style */
+.border-editorial {
+  border-color: #e0e0e0;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--accent-sport);
+  color: white;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
