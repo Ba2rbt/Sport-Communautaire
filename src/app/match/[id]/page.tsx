@@ -105,7 +105,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
     notFound()
   }
 
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
