@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { type ReactNode } from 'react'
 
-type TagVariant = 'sport' | 'default' | 'outline' | 'muted'
+type TagVariant = 'sport' | 'default' | 'outline' | 'muted' | 'category'
 
 interface TagProps {
   children: ReactNode
@@ -28,6 +28,10 @@ const variantStyles: Record<TagVariant, { base: string; active: string }> = {
   muted: {
     base: 'bg-muted/10 text-muted hover:bg-muted/20',
     active: 'bg-muted/30 text-primary',
+  },
+  category: {
+    base: 'bg-accent-mvp/10 text-accent-mvp hover:bg-accent-mvp hover:text-white',
+    active: 'bg-accent-mvp text-white',
   },
 }
 
