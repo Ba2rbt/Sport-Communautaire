@@ -533,3 +533,96 @@ CREATE INDEX IF NOT EXISTS idx_expert_articles_published ON public.expert_articl
 CREATE INDEX IF NOT EXISTS idx_expert_articles_featured ON public.expert_articles(is_featured);
 CREATE INDEX IF NOT EXISTS idx_expert_articles_category ON public.expert_articles(category);
 CREATE INDEX IF NOT EXISTS idx_expert_articles_created ON public.expert_articles(created_at DESC);
+
+-- =============================================================================
+-- PLAYERS TABLE (for MVP system)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.players (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  team_name TEXT NOT NULL,
+  team_logo_url TEXT,
+  photo_url TEXT,
+  position TEXT, -- 'GK', 'DEF', 'MID', 'FWD'
+  nationality TEXT,
+  jersey_number INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.players ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Players are viewable by everyone" ON public.players FOR SELECT USING (true);
+
+DROP TRIGGER IF EXISTS update_players_updated_at ON public.players;
+CREATE TRIGGER update_players_updated_at
+  BEFORE UPDATE ON public.players
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =============================================================================
+-- SEASON MVP VOTES TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.season_mvp_votes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  competition_id TEXT REFERENCES public.competitions(id) ON DELETE CASCADE NOT NULL,
+  match_id UUID REFERENCES public.matches(id) ON DELETE CASCADE,
+  player_id UUID REFERENCES public.players(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  -- One vote per user per match (if match_id provided) or per competition per week
+  UNIQUE (competition_id, match_id, user_id)
+);
+
+ALTER TABLE public.season_mvp_votes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Votes are viewable by everyone"
+  ON public.season_mvp_votes FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can vote"
+  ON public.season_mvp_votes FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can remove their own vote"
+  ON public.season_mvp_votes FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- =============================================================================
+-- MVP LEADERBOARD VIEW (Aggregation)
+-- =============================================================================
+CREATE OR REPLACE VIEW public.mvp_leaderboard AS
+SELECT 
+  p.id AS player_id,
+  p.name AS player_name,
+  p.team_name,
+  p.team_logo_url,
+  p.photo_url,
+  p.position,
+  p.nationality,
+  p.jersey_number,
+  v.competition_id,
+  COUNT(v.id) AS total_votes,
+  COUNT(DISTINCT v.user_id) AS unique_voters,
+  COUNT(DISTINCT v.match_id) AS matches_voted,
+  ROUND(
+    COUNT(v.id)::NUMERIC / NULLIF(
+      (SELECT COUNT(*) FROM public.season_mvp_votes WHERE competition_id = v.competition_id), 
+      0
+    ) * 100, 
+    2
+  ) AS vote_percentage
+FROM public.players p
+LEFT JOIN public.season_mvp_votes v ON p.id = v.player_id
+WHERE v.competition_id IS NOT NULL
+GROUP BY 
+  p.id, p.name, p.team_name, p.team_logo_url, p.photo_url, 
+  p.position, p.nationality, p.jersey_number, v.competition_id
+ORDER BY total_votes DESC;
+
+-- =============================================================================
+-- INDEXES
+-- =============================================================================
+CREATE INDEX IF NOT EXISTS idx_players_team ON public.players(team_name);
+CREATE INDEX IF NOT EXISTS idx_players_position ON public.players(position);
+CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_competition ON public.season_mvp_votes(competition_id);
+CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_player ON public.season_mvp_votes(player_id);
+CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_user ON public.season_mvp_votes(user_id);
+CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_match ON public.season_mvp_votes(match_id);
