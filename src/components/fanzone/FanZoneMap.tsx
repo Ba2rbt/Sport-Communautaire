@@ -1,11 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import type { FanZone } from '@/types/fanzone'
 import { amenityLabels } from '@/types/fanzone'
-
-// Dynamic import for Leaflet (client-side only)
-import dynamic from 'next/dynamic'
 
 interface FanZoneMapProps {
   fanZones: FanZone[]
@@ -15,197 +12,207 @@ interface FanZoneMapProps {
   zoom?: number
 }
 
-// Leaflet components loaded dynamically to avoid SSR issues
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-)
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-)
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-)
-const Popup = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Popup),
-  { ssr: false }
-)
+export default function FanZoneMap({ 
+  fanZones, 
+  selectedId, 
+  onMarkerClick, 
+  center = [46.603354, 1.888334], 
+  zoom = 6 
+}: FanZoneMapProps) {
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapInstanceRef = useRef<any>(null)
+  const markersRef = useRef<Map<string, any>>(new Map())
+  const [isMapReady, setIsMapReady] = useState(false)
+  const leafletRef = useRef<typeof import('leaflet') | null>(null)
 
-function MapContent({ fanZones, selectedId, onMarkerClick, center, zoom }: FanZoneMapProps) {
-  const [L, setL] = useState<typeof import('leaflet') | null>(null)
-
+  // Initialize map on client side only
   useEffect(() => {
-    import('leaflet').then((leaflet) => {
-      setL(leaflet.default)
+    if (typeof window === 'undefined' || !mapContainerRef.current) return
+    if (mapInstanceRef.current) return // Already initialized
+
+    // Dynamic import of Leaflet
+    const initMap = async () => {
+      try {
+        // Import Leaflet dynamically
+        const L = await import('leaflet')
+        leafletRef.current = L.default
+
+        // Import CSS
+        await import('leaflet/dist/leaflet.css')
+
+        // Fix default icon paths
+        delete (L.default.Icon.Default.prototype as any)._getIconUrl
+        L.default.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        })
+
+        // Create map
+        const map = L.default.map(mapContainerRef.current!).setView(center, zoom)
+        
+        // Add OpenStreetMap tiles
+        L.default.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19,
+        }).addTo(map)
+
+        mapInstanceRef.current = map
+        setIsMapReady(true)
+      } catch (error) {
+        console.error('Failed to initialize map:', error)
+      }
+    }
+
+    initMap()
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+        setIsMapReady(false)
+      }
+    }
+  }, [center, zoom])
+
+  // Add/update markers when map is ready or fanZones change
+  useEffect(() => {
+    if (!isMapReady || !mapInstanceRef.current || !leafletRef.current) return
+
+    const L = leafletRef.current
+    const map = mapInstanceRef.current
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove())
+    markersRef.current.clear()
+
+    // Create custom icon function
+    const createIcon = (isSelected: boolean, teamLogo?: string) => {
+      const size = isSelected ? 44 : 36
+      const bgColor = isSelected ? '#00b140' : '#0066cc'
+      const emoji = teamLogo || '🏟️'
+      
+      return L.divIcon({
+        className: 'custom-fanzone-marker',
+        html: `
+          <div style="
+            width: ${size}px;
+            height: ${size}px;
+            background: ${bgColor};
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: ${isSelected ? '20px' : '16px'};
+            ${isSelected ? 'animation: marker-pulse 1.5s ease-in-out infinite;' : ''}
+          ">
+            ${emoji}
+          </div>
+        `,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size],
+        popupAnchor: [0, -size],
+      })
+    }
+
+    // Add markers for each fan zone
+    fanZones.forEach((fanZone) => {
+      const isSelected = selectedId === fanZone.id
+      const icon = createIcon(isSelected, fanZone.teamLogo)
+
+      const marker = L.marker([fanZone.lat, fanZone.lng], { icon }).addTo(map)
+
+      // Create popup content
+      const amenitiesHtml = fanZone.amenities?.map((amenity) => {
+        const info = amenityLabels[amenity as keyof typeof amenityLabels]
+        return info ? `<span title="${info.label}" style="margin-right: 4px;">${info.icon}</span>` : ''
+      }).join('') || ''
+
+      const popupContent = `
+        <div style="min-width: 220px; font-family: system-ui, sans-serif;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 28px;">${fanZone.teamLogo || '🏟️'}</span>
+            <div>
+              <strong style="font-size: 14px; color: #0a0a0a;">${fanZone.name}</strong>
+              <div style="font-size: 12px; color: #666;">${fanZone.city}</div>
+            </div>
+          </div>
+          ${fanZone.teamName ? `<div style="font-size: 12px; color: #0066cc; font-weight: 600; margin-bottom: 8px;">${fanZone.teamName}</div>` : ''}
+          ${fanZone.description ? `<p style="font-size: 12px; color: #666; margin-bottom: 8px; line-height: 1.4;">${fanZone.description.substring(0, 100)}...</p>` : ''}
+          ${amenitiesHtml ? `<div style="margin-bottom: 8px;">${amenitiesHtml}</div>` : ''}
+          ${fanZone.capacity ? `<div style="font-size: 11px; color: #666; padding-top: 8px; border-top: 1px solid #eee;">👥 Capacité: ${fanZone.capacity} pers.</div>` : ''}
+        </div>
+      `
+
+      marker.bindPopup(popupContent, { maxWidth: 280 })
+
+      // Handle click
+      marker.on('click', () => {
+        onMarkerClick?.(fanZone.id)
+      })
+
+      markersRef.current.set(fanZone.id, marker)
     })
-  }, [])
 
-  if (!L) return null
-
-  // Custom marker icons
-  const defaultIcon = L.divIcon({
-    className: 'custom-marker',
-    html: `
-      <div style="
-        width: 32px;
-        height: 32px;
-        background: #0066cc;
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      ">
-        <span style="font-size: 14px;">🏟️</span>
-      </div>
-    `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  })
-
-  const selectedIcon = L.divIcon({
-    className: 'custom-marker-selected',
-    html: `
-      <div style="
-        width: 40px;
-        height: 40px;
-        background: #00b140;
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 4px 12px rgba(0,177,64,0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: pulse 1.5s infinite;
-      ">
-        <span style="font-size: 18px;">🏟️</span>
-      </div>
-    `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-  })
+    // If selected, center and open popup
+    if (selectedId) {
+      const selectedMarker = markersRef.current.get(selectedId)
+      const fanZone = fanZones.find(fz => fz.id === selectedId)
+      if (selectedMarker && fanZone) {
+        map.setView([fanZone.lat, fanZone.lng], Math.max(map.getZoom(), 10), { animate: true })
+        selectedMarker.openPopup()
+      }
+    }
+  }, [isMapReady, fanZones, selectedId, onMarkerClick])
 
   return (
     <>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {fanZones.map((fanZone) => (
-        <Marker
-          key={fanZone.id}
-          position={[fanZone.lat, fanZone.lng]}
-          icon={selectedId === fanZone.id ? selectedIcon : defaultIcon}
-          eventHandlers={{
-            click: () => onMarkerClick?.(fanZone.id),
-          }}
-        >
-          <Popup>
-            <div className="min-w-[200px] p-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{fanZone.teamLogo || '🏟️'}</span>
-                <div>
-                  <h3 className="font-bold text-primary text-sm">{fanZone.name}</h3>
-                  <p className="text-xs text-muted">{fanZone.city}</p>
-                </div>
-              </div>
-              {fanZone.teamName && (
-                <p className="text-xs text-accent-sport font-medium mb-2">
-                  {fanZone.teamName}
-                </p>
-              )}
-              {fanZone.description && (
-                <p className="text-xs text-muted mb-2 line-clamp-2">
-                  {fanZone.description}
-                </p>
-              )}
-              {fanZone.amenities && fanZone.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {fanZone.amenities.map((amenity) => {
-                    const info = (amenityLabels as Record<string, { label: string; icon: string }>)[amenity]
-                    return info ? (
-                      <span key={amenity} className="text-sm" title={info.label}>
-                        {info.icon}
-                      </span>
-                    ) : null
-                  })}
-                </div>
-              )}
-              {fanZone.address && (
-                <p className="text-xs text-muted border-t border-gray-200 pt-2 mt-2">
-                  📍 {fanZone.address}
-                </p>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </>
-  )
-}
-
-export default function FanZoneMap({ fanZones, selectedId, onMarkerClick, center = [46.603354, 1.888334], zoom = 6 }: FanZoneMapProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <div className="w-full h-full bg-secondary rounded-lg flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-accent-sport/30 border-t-accent-sport rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted">Chargement de la carte...</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="w-full h-full rounded-lg overflow-hidden border border-editorial shadow-lg">
       <style jsx global>{`
-        @import 'leaflet/dist/leaflet.css';
-        
-        .leaflet-container {
-          width: 100%;
-          height: 100%;
-          font-family: inherit;
-        }
-        
-        .leaflet-popup-content-wrapper {
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        
-        .leaflet-popup-content {
-          margin: 8px 12px;
-        }
-        
-        @keyframes pulse {
+        @keyframes marker-pulse {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.1); }
         }
+        
+        .custom-fanzone-marker {
+          background: transparent !important;
+          border: none !important;
+        }
+        
+        .leaflet-popup-content-wrapper {
+          border-radius: 12px !important;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .leaflet-popup-content {
+          margin: 12px 16px !important;
+        }
+        
+        .leaflet-container {
+          font-family: system-ui, sans-serif;
+          z-index: 1;
+        }
+        
+        .leaflet-control-attribution {
+          font-size: 10px;
+        }
       `}</style>
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
-      >
-        <MapContent
-          fanZones={fanZones}
-          selectedId={selectedId}
-          onMarkerClick={onMarkerClick}
-          center={center}
-          zoom={zoom}
+      <div className="relative w-full h-full rounded-lg overflow-hidden border border-editorial shadow-lg bg-secondary">
+        {!isMapReady && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-accent-sport/30 border-t-accent-sport rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-muted">Chargement de la carte...</p>
+            </div>
+          </div>
+        )}
+        <div 
+          ref={mapContainerRef} 
+          className="w-full h-full"
+          style={{ minHeight: '400px' }}
         />
-      </MapContainer>
-    </div>
+      </div>
+    </>
   )
 }
