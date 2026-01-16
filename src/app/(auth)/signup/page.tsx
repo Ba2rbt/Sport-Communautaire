@@ -36,6 +36,14 @@ export default function SignupPage() {
           {/* Form Card */}
           <div className="bg-white border border-editorial rounded-lg p-8">
             <form action={formAction} className="space-y-6">
+              {/* Success Message (email confirmation) */}
+              {state.success && state.message && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-600 font-medium">✓ Inscription réussie !</p>
+                  <p className="text-sm text-green-600 mt-1">{state.message}</p>
+                </div>
+              )}
+
               {/* Error Message */}
               {state.error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">

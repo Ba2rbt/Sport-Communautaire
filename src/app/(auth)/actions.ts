@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 export interface AuthState {
   error?: string
   success?: boolean
+  message?: string
 }
 
 export async function login(
@@ -54,21 +55,48 @@ export async function signup(
     return { error: 'Le mot de passe doit contenir au moins 6 caractères' }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
       },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
     },
   })
 
   if (error) {
+    console.error('Signup error:', error.message)
+    
     if (error.message.includes('already registered')) {
       return { error: 'Cet email est déjà utilisé' }
     }
-    return { error: 'Une erreur est survenue lors de l\'inscription' }
+    if (error.message.includes('valid email')) {
+      return { error: 'Veuillez entrer une adresse email valide' }
+    }
+    if (error.message.includes('Password')) {
+      return { error: 'Le mot de passe doit contenir au moins 6 caractères' }
+    }
+    if (error.message.includes('rate limit')) {
+      return { error: 'Trop de tentatives, veuillez réessayer plus tard' }
+    }
+    // Show actual error for debugging
+    return { error: `Erreur: ${error.message}` }
+  }
+
+  // Check if email confirmation is required
+  if (data?.user?.identities?.length === 0) {
+    return { error: 'Cet email est déjà utilisé' }
+  }
+
+  // If email confirmation is enabled in Supabase
+  if (data?.user && !data?.session) {
+    return { 
+      success: true,
+      error: undefined,
+      message: 'Vérifiez votre email pour confirmer votre inscription'
+    }
   }
 
   revalidatePath('/', 'layout')
