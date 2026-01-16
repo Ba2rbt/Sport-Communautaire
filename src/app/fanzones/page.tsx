@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import FanZonesMapSection from './FanZonesMapSection'
+import type { FanZone as FanZoneLocation } from '@/types/fanzone'
 
-interface FanZone {
+interface FanZoneCommunity {
   id: string
   name: string
   team: string
@@ -11,7 +13,7 @@ interface FanZone {
   coverColor: string
 }
 
-const mockFanZones: FanZone[] = [
+const mockFanZones: FanZoneCommunity[] = [
   {
     id: 'psg',
     name: 'Collectif Ultras Paris',
@@ -74,7 +76,101 @@ const mockFanZones: FanZone[] = [
   },
 ]
 
-function FanZoneCard({ fanzone }: { fanzone: FanZone }) {
+// Fan zone locations for map
+const mockFanZoneLocations: FanZoneLocation[] = [
+  {
+    id: 'fz-1',
+    name: 'Le Comptoir du Sport',
+    city: 'Paris',
+    address: '15 Rue de Rivoli, 75001 Paris',
+    lat: 48.8566,
+    lng: 2.3522,
+    teamName: 'Paris Saint-Germain',
+    teamLogo: '🔵',
+    description: 'Le QG des supporters parisiens avec écran géant.',
+    capacity: 200,
+    amenities: ['screen', 'bar', 'food', 'wifi'],
+    isVerified: true,
+    isActive: true,
+  },
+  {
+    id: 'fz-2',
+    name: 'La Brasserie Olympique',
+    city: 'Marseille',
+    address: '42 Quai du Port, 13002 Marseille',
+    lat: 43.2965,
+    lng: 5.3698,
+    teamName: 'Olympique de Marseille',
+    teamLogo: '⚪',
+    description: 'Vue sur le Vieux-Port et ambiance chaleureuse.',
+    capacity: 350,
+    amenities: ['screen', 'bar', 'food', 'terrace'],
+    isVerified: true,
+    isActive: true,
+  },
+  {
+    id: 'fz-3',
+    name: 'Le Repaire des Gones',
+    city: 'Lyon',
+    address: '8 Place Bellecour, 69002 Lyon',
+    lat: 45.7640,
+    lng: 4.8357,
+    teamName: 'Olympique Lyonnais',
+    teamLogo: '🦁',
+    description: 'Bar à thème OL avec maillots historiques.',
+    capacity: 150,
+    amenities: ['screen', 'bar', 'food', 'wifi'],
+    isVerified: true,
+    isActive: true,
+  },
+  {
+    id: 'fz-4',
+    name: 'Le Chaudron Vert',
+    city: 'Saint-Étienne',
+    address: '25 Place Jean Jaurès, 42000 Saint-Étienne',
+    lat: 45.4397,
+    lng: 4.3872,
+    teamName: 'AS Saint-Étienne',
+    teamLogo: '💚',
+    description: 'L\'antre des supporters stéphanois.',
+    capacity: 180,
+    amenities: ['screen', 'bar', 'terrace', 'parking'],
+    isVerified: false,
+    isActive: true,
+  },
+  {
+    id: 'fz-5',
+    name: 'Le Café des Dogues',
+    city: 'Lille',
+    address: '12 Grand Place, 59000 Lille',
+    lat: 50.6292,
+    lng: 3.0573,
+    teamName: 'LOSC Lille',
+    teamLogo: '🐕',
+    description: 'Point de ralliement des supporters du LOSC.',
+    capacity: 120,
+    amenities: ['screen', 'bar', 'food'],
+    isVerified: true,
+    isActive: true,
+  },
+  {
+    id: 'fz-6',
+    name: 'Le Bistrot Sang et Or',
+    city: 'Lens',
+    address: '5 Place du Cantin, 62300 Lens',
+    lat: 50.4289,
+    lng: 2.8319,
+    teamName: 'RC Lens',
+    teamLogo: '🟡',
+    description: 'À deux pas du stade Bollaert.',
+    capacity: 250,
+    amenities: ['screen', 'bar', 'food', 'parking'],
+    isVerified: true,
+    isActive: true,
+  },
+]
+
+function FanZoneCard({ fanzone }: { fanzone: FanZoneCommunity }) {
   return (
     <Link 
       href={`/fanzones/${fanzone.id}`}
@@ -129,7 +225,7 @@ export default function FanZonesPage() {
   const otherFanZones = mockFanZones.filter(fz => !fz.isLive)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Header */}
       <div className="text-center">
         <h1 className="font-editorial text-5xl font-bold text-primary mb-4">
@@ -160,10 +256,33 @@ export default function FanZonesPage() {
         </section>
       )}
 
+      {/* Map Section */}
+      <section className="bg-white border border-editorial rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-editorial bg-secondary/30">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-accent-sport rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="font-editorial text-2xl font-bold text-primary">
+                Trouvez un bar près de chez vous
+              </h2>
+              <p className="text-sm text-muted">
+                Bars et restaurants pour regarder les matchs
+              </p>
+            </div>
+          </div>
+        </div>
+        <FanZonesMapSection fanZoneLocations={mockFanZoneLocations} />
+      </section>
+
       {/* All FanZones */}
       <section>
         <h2 className="font-editorial text-2xl font-bold text-primary mb-6">
-          Toutes les FanZones
+          Toutes les communautés
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {otherFanZones.map((fanzone) => (
