@@ -626,3 +626,80 @@ CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_competition ON public.season_mvp
 CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_player ON public.season_mvp_votes(player_id);
 CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_user ON public.season_mvp_votes(user_id);
 CREATE INDEX IF NOT EXISTS idx_season_mvp_votes_match ON public.season_mvp_votes(match_id);
+
+-- =============================================================================
+-- USER FAVORITES TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.user_favorites (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  favorite_type TEXT NOT NULL CHECK (favorite_type IN ('team', 'player', 'competition')),
+  favorite_id TEXT NOT NULL, -- team_name, player_id, or competition_id
+  favorite_name TEXT NOT NULL,
+  favorite_logo TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  UNIQUE (user_id, favorite_type, favorite_id)
+);
+
+ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own favorites"
+  ON public.user_favorites FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can add favorites"
+  ON public.user_favorites FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can remove favorites"
+  ON public.user_favorites FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- =============================================================================
+-- UPDATE PROFILES TABLE (add bio, location)
+-- =============================================================================
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'bio'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN bio TEXT;
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'location'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN location TEXT;
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'favorite_team'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN favorite_team TEXT;
+  END IF;
+END $$;
+
+-- =============================================================================
+-- USER STATS VIEW
+-- =============================================================================
+CREATE OR REPLACE VIEW public.user_stats AS
+SELECT 
+  p.id AS user_id,
+  p.full_name,
+  p.avatar_url,
+  p.created_at AS member_since,
+  (SELECT COUNT(*) FROM public.season_mvp_votes WHERE user_id = p.id) AS total_mvp_votes,
+  (SELECT COUNT(*) FROM public.user_favorites WHERE user_id = p.id) AS total_favorites,
+  (SELECT COUNT(*) FROM public.thread_posts WHERE author_id = p.id) AS total_posts,
+  (SELECT COUNT(*) FROM public.threads WHERE author_id = p.id) AS total_threads,
+  (SELECT COUNT(*) FROM public.match_comments WHERE author_id = p.id) AS total_comments
+FROM public.profiles p;
+
+-- =============================================================================
+-- INDEXES
+-- =============================================================================
+CREATE INDEX IF NOT EXISTS idx_user_favorites_user ON public.user_favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_favorites_type ON public.user_favorites(favorite_type);
