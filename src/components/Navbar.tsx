@@ -5,6 +5,7 @@ import NavbarClient from './NavbarClient'
 const navLinks = [
   { href: '/matches', label: 'Matches' },
   { href: '/competitions', label: 'Compétitions' },
+  { href: '/mvp', label: '🏆 MVP' },
   { href: '/fanzones', label: 'FanZones' },
   { href: '/community', label: 'Community' },
   { href: '/experts', label: 'Experts' },
