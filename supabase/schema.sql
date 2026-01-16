@@ -453,3 +453,83 @@ CREATE INDEX IF NOT EXISTS idx_posts_created ON public.thread_posts(created_at);
 CREATE INDEX IF NOT EXISTS idx_likes_thread ON public.likes(thread_id);
 CREATE INDEX IF NOT EXISTS idx_likes_post ON public.likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_likes_user ON public.likes(user_id);
+
+-- =============================================================================
+-- EXPERT ARTICLES TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.expert_articles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  author_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL CHECK (char_length(title) >= 5 AND char_length(title) <= 200),
+  slug TEXT NOT NULL UNIQUE,
+  excerpt TEXT CHECK (char_length(excerpt) <= 300),
+  content_md TEXT NOT NULL,
+  cover_image TEXT,
+  category TEXT DEFAULT 'analysis',
+  read_time INTEGER, -- in minutes
+  is_published BOOLEAN DEFAULT false,
+  is_featured BOOLEAN DEFAULT false,
+  views_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.expert_articles ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can view published articles
+CREATE POLICY "Published articles are viewable by everyone"
+  ON public.expert_articles FOR SELECT
+  USING (is_published = true);
+
+-- Authors can view their own articles (including drafts)
+CREATE POLICY "Authors can view own articles"
+  ON public.expert_articles FOR SELECT
+  USING (auth.uid() = author_id);
+
+-- Only experts can create articles
+CREATE POLICY "Experts can create articles"
+  ON public.expert_articles FOR INSERT
+  WITH CHECK (
+    auth.uid() = author_id AND
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'expert'
+    )
+  );
+
+-- Authors can update their own articles
+CREATE POLICY "Authors can update own articles"
+  ON public.expert_articles FOR UPDATE
+  USING (auth.uid() = author_id)
+  WITH CHECK (auth.uid() = author_id);
+
+-- Authors can delete their own articles
+CREATE POLICY "Authors can delete own articles"
+  ON public.expert_articles FOR DELETE
+  USING (auth.uid() = author_id);
+
+DROP TRIGGER IF EXISTS update_expert_articles_updated_at ON public.expert_articles;
+CREATE TRIGGER update_expert_articles_updated_at
+  BEFORE UPDATE ON public.expert_articles
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Add role column to profiles if not exists
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'role'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN role TEXT DEFAULT 'user';
+  END IF;
+END $$;
+
+-- =============================================================================
+-- INDEXES
+-- =============================================================================
+CREATE INDEX IF NOT EXISTS idx_expert_articles_author ON public.expert_articles(author_id);
+CREATE INDEX IF NOT EXISTS idx_expert_articles_slug ON public.expert_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_expert_articles_published ON public.expert_articles(is_published);
+CREATE INDEX IF NOT EXISTS idx_expert_articles_featured ON public.expert_articles(is_featured);
+CREATE INDEX IF NOT EXISTS idx_expert_articles_category ON public.expert_articles(category);
+CREATE INDEX IF NOT EXISTS idx_expert_articles_created ON public.expert_articles(created_at DESC);
