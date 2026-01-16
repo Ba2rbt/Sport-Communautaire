@@ -1,0 +1,718 @@
+{
+  "name": "SportUnion - Sync Matches API-Football",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Cron 30min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "61"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-ligue1",
+      "name": "API Ligue 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 100],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "39"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-premier-league",
+      "name": "API Premier League",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 250],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "140"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-la-liga",
+      "name": "API La Liga",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "135"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-serie-a",
+      "name": "API Serie A",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 550],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "78"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-bundesliga",
+      "name": "API Bundesliga",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 700],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "63"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-national",
+      "name": "API National",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 850],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "API_FOOTBALL_CREDENTIAL_ID",
+          "name": "API-Football"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-all",
+      "name": "Merge All Leagues",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [750, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse API-Football response and transform to Supabase format\nconst allMatches = [];\nconst allTeams = new Map();\nconst allCompetitions = new Map();\n\nfor (const item of $input.all()) {\n  const response = item.json.response || [];\n  \n  for (const fixture of response) {\n    const { fixture: f, league, teams, goals, score } = fixture;\n    \n    // Map status\n    let status = 'upcoming';\n    if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(f.status.short)) {\n      status = 'live';\n    } else if (['FT', 'AET', 'PEN', 'AWD', 'WO'].includes(f.status.short)) {\n      status = 'finished';\n    }\n    \n    // Extract date and time\n    const matchDate = new Date(f.date);\n    const dateStr = matchDate.toISOString().split('T')[0];\n    const timeStr = matchDate.toTimeString().split(' ')[0].substring(0, 5);\n    \n    // Build match object\n    const match = {\n      id: `api-${f.id}`,\n      team1: teams.home.name,\n      team2: teams.away.name,\n      score1: goals.home ?? 0,\n      score2: goals.away ?? 0,\n      status,\n      league: league.name,\n      image: league.logo || '',\n      date: dateStr,\n      time: timeStr,\n      stadium: f.venue?.name || null,\n      api_fixture_id: f.id\n    };\n    allMatches.push(match);\n    \n    // Collect teams\n    if (!allTeams.has(teams.home.id)) {\n      allTeams.set(teams.home.id, {\n        id: `team-${teams.home.id}`,\n        name: teams.home.name,\n        logo_url: teams.home.logo,\n        api_team_id: teams.home.id\n      });\n    }\n    if (!allTeams.has(teams.away.id)) {\n      allTeams.set(teams.away.id, {\n        id: `team-${teams.away.id}`,\n        name: teams.away.name,\n        logo_url: teams.away.logo,\n        api_team_id: teams.away.id\n      });\n    }\n    \n    // Collect competitions\n    if (!allCompetitions.has(league.id)) {\n      const leagueSlug = league.name.toLowerCase()\n        .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n        .replace(/[^a-z0-9]+/g, '-')\n        .replace(/(^-|-$)/g, '');\n      \n      allCompetitions.set(league.id, {\n        id: leagueSlug,\n        name: league.name,\n        logo_url: league.logo,\n        country: league.country,\n        current_season: String(league.season),\n        api_league_id: league.id\n      });\n    }\n  }\n}\n\nreturn [\n  {\n    json: {\n      matches: allMatches,\n      teams: Array.from(allTeams.values()),\n      competitions: Array.from(allCompetitions.values()),\n      stats: {\n        totalMatches: allMatches.length,\n        totalTeams: allTeams.size,\n        totalCompetitions: allCompetitions.size,\n        timestamp: new Date().toISOString()\n      }\n    }\n  }\n];"
+      },
+      "id": "parse-json",
+      "name": "Parse & Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [950, 400]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "tableId": "competitions",
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "column": "name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "column": "logo_url",
+              "value": "={{ $json.logo_url }}"
+            },
+            {
+              "column": "country",
+              "value": "={{ $json.country }}"
+            },
+            {
+              "column": "current_season",
+              "value": "={{ $json.current_season }}"
+            }
+          ]
+        },
+        "conflictType": "primaryKey",
+        "options": {}
+      },
+      "id": "supabase-competitions",
+      "name": "Upsert Competitions",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1200, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase SportUnion"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "tableId": "matches",
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "column": "team1",
+              "value": "={{ $json.team1 }}"
+            },
+            {
+              "column": "team2",
+              "value": "={{ $json.team2 }}"
+            },
+            {
+              "column": "score1",
+              "value": "={{ $json.score1 }}"
+            },
+            {
+              "column": "score2",
+              "value": "={{ $json.score2 }}"
+            },
+            {
+              "column": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "column": "league",
+              "value": "={{ $json.league }}"
+            },
+            {
+              "column": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "column": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "column": "time",
+              "value": "={{ $json.time }}"
+            },
+            {
+              "column": "stadium",
+              "value": "={{ $json.stadium }}"
+            }
+          ]
+        },
+        "conflictType": "primaryKey",
+        "options": {}
+      },
+      "id": "supabase-matches",
+      "name": "Upsert Matches",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1200, 400],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase SportUnion"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split data for separate upserts\nconst data = $input.first().json;\n\n// Return matches for processing\nreturn data.matches.map(match => ({ json: match }));"
+      },
+      "id": "split-matches",
+      "name": "Split Matches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1150, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split competitions for processing\nconst data = $input.first().json;\nreturn data.competitions.map(comp => ({ json: comp }));"
+      },
+      "id": "split-competitions",
+      "name": "Split Competitions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1150, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $credentials.webhookUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "✅ **SportUnion Sync Complete**\n📊 Matches: {{ $('Parse & Transform').item.json.stats.totalMatches }}\n🏟️ Competitions: {{ $('Parse & Transform').item.json.stats.totalCompetitions }}\n⏰ {{ $now.toFormat('dd/MM/yyyy HH:mm') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-success",
+      "name": "Discord Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1450, 400],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "DISCORD_WEBHOOK_CREDENTIAL_ID",
+          "name": "Discord Webhook"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $credentials.webhookUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "❌ **SportUnion Sync Error**\n🔴 Node: {{ $execution.error?.node?.name || 'Unknown' }}\n💬 Error: {{ $execution.error?.message || 'Unknown error' }}\n⏰ {{ $now.toFormat('dd/MM/yyyy HH:mm') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-error",
+      "name": "Discord Error",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1450, 600],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "DISCORD_WEBHOOK_CREDENTIAL_ID",
+          "name": "Discord Webhook"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [1200, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-data",
+              "leftValue": "={{ $json.stats.totalMatches }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-has-data",
+      "name": "Has Data?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "Cron 30min": {
+      "main": [
+        [
+          {
+            "node": "API Ligue 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "API Premier League",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "API La Liga",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "API Serie A",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "API Bundesliga",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "API National",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Ligue 1": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Premier League": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API La Liga": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Serie A": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Bundesliga": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API National": {
+      "main": [
+        [
+          {
+            "node": "Merge All Leagues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge All Leagues": {
+      "main": [
+        [
+          {
+            "node": "Parse & Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Transform": {
+      "main": [
+        [
+          {
+            "node": "Has Data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Data?": {
+      "main": [
+        [
+          {
+            "node": "Split Competitions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Matches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Competitions": {
+      "main": [
+        [
+          {
+            "node": "Upsert Competitions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Matches": {
+      "main": [
+        [
+          {
+            "node": "Upsert Matches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Matches": {
+      "main": [
+        [
+          {
+            "node": "Discord Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Discord Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "SportUnion",
+      "id": "1"
+    },
+    {
+      "name": "Sync",
+      "id": "2"
+    }
+  ],
+  "pinData": {},
+  "versionId": "1"
+}
