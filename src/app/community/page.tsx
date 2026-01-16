@@ -1,52 +1,119 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import CommunityClient from './CommunityClient'
+import type { Thread, ThreadCategory } from '@/types/community'
+
+// Mock data for demo
+const mockThreads: Thread[] = [
+  {
+    id: 'thread-1',
+    title: '🔥 Pronostics pour le Classico PSG-OM ce weekend !',
+    content: 'Le match de l\'année approche ! Qui selon vous va l\'emporter ? Je mise sur un 2-1 pour le PSG avec un doublé de Mbappé.',
+    author: { id: 'u1', email: 'jean@example.com', fullName: 'Jean Dupont' },
+    category: 'matchday',
+    isPinned: true,
+    isLocked: false,
+    viewsCount: 1250,
+    repliesCount: 47,
+    likesCount: 89,
+    isLikedByUser: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    lastReplyAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    lastReplyAuthor: { id: 'u2', email: 'marie@example.com', fullName: 'Marie Martin' },
+  },
+  {
+    id: 'thread-2',
+    title: 'Analyse tactique : pourquoi le 4-3-3 de Luis Enrique fonctionne',
+    content: 'Décortiquons ensemble le système de jeu du PSG cette saison. Points forts, points faibles et alternatives possibles.',
+    author: { id: 'u3', email: 'pierre@example.com', fullName: 'Pierre Expert', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pierre' },
+    category: 'tactics',
+    isPinned: false,
+    isLocked: false,
+    viewsCount: 856,
+    repliesCount: 23,
+    likesCount: 67,
+    isLikedByUser: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+  },
+  {
+    id: 'thread-3',
+    title: 'Rumeur mercato : Un attaquant de Premier League vers l\'OM ?',
+    content: 'Selon plusieurs sources anglaises, l\'OM serait sur les traces d\'un attaquant évoluant actuellement en Premier League...',
+    author: { id: 'u4', email: 'sophie@example.com', fullName: 'Sophie Bernard' },
+    category: 'transfers',
+    isPinned: false,
+    isLocked: false,
+    viewsCount: 2340,
+    repliesCount: 89,
+    likesCount: 45,
+    isLikedByUser: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    lastReplyAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    lastReplyAuthor: { id: 'u5', email: 'luc@example.com', fullName: 'Luc Mercato' },
+  },
+  {
+    id: 'thread-4',
+    title: 'Quel est votre plus beau souvenir de supporter ?',
+    content: 'Pour moi c\'est forcément la finale 2006 en Allemagne. Une ambiance incroyable malgré la défaite...',
+    author: { id: 'u6', email: 'thomas@example.com', fullName: 'Thomas Nostalgie' },
+    category: 'general',
+    isPinned: false,
+    isLocked: false,
+    viewsCount: 567,
+    repliesCount: 34,
+    likesCount: 78,
+    isLikedByUser: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+  },
+  {
+    id: 'thread-5',
+    title: 'Comment fonctionne le système de points en Ligue 1 ?',
+    content: 'Question de débutant : je ne comprends pas comment les points sont attribués et le classement établi.',
+    author: { id: 'u7', email: 'newbie@example.com', fullName: 'Nouveau Fan' },
+    category: 'help',
+    isPinned: false,
+    isLocked: false,
+    viewsCount: 123,
+    repliesCount: 8,
+    likesCount: 12,
+    isLikedByUser: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+  },
+  {
+    id: 'thread-6',
+    title: 'Vos jeux vidéo de foot préférés ?',
+    content: 'FC 25, eFootball ou autre chose ? Personnellement je reste fidèle à Football Manager depuis des années.',
+    author: { id: 'u8', email: 'gamer@example.com', fullName: 'GameFan' },
+    category: 'offtopic',
+    isPinned: false,
+    isLocked: false,
+    viewsCount: 234,
+    repliesCount: 19,
+    likesCount: 23,
+    isLikedByUser: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+  },
+]
+
+export const metadata = {
+  title: 'Communauté | SportUnion',
+  description: 'Rejoignez la discussion avec d\'autres fans de sport. Partagez vos analyses, pronostics et opinions.',
+}
 
 export default async function CommunityPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Redirect to login if not authenticated
   if (!user) {
-    redirect('/login')
+    redirect('/login?redirectTo=/community')
   }
 
-  return (
-    <div className="min-h-screen bg-secondary">
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        {/* Header */}
-        <div className="mb-12">
-          <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
-            Espace communauté
-          </span>
-          <h1 className="font-editorial text-4xl md:text-5xl font-bold text-primary">
-            Community
-          </h1>
-          <p className="text-muted mt-4 max-w-2xl">
-            Bienvenue dans l&apos;espace communauté SportUnion. Échangez avec d&apos;autres passionnés de sport.
-          </p>
-        </div>
-
-        {/* Coming Soon Card */}
-        <div className="bg-white border border-editorial rounded-lg p-12 text-center max-w-2xl mx-auto">
-          <div className="w-16 h-16 bg-accent-sport/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-accent-sport" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          </div>
-          <h2 className="font-editorial text-2xl font-bold text-primary mb-3">
-            Bientôt disponible
-          </h2>
-          <p className="text-muted mb-6">
-            L&apos;espace communauté est en cours de développement. Vous pourrez bientôt créer des discussions, 
-            rejoindre des groupes et interagir avec d&apos;autres fans.
-          </p>
-          <div className="flex items-center justify-center gap-2 text-accent-sport text-sm font-medium">
-            <svg className="w-5 h-5 animate-pulse-live" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-            </svg>
-            En développement
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  return <CommunityClient threads={mockThreads} user={user} />
 }

@@ -327,3 +327,129 @@ CREATE INDEX IF NOT EXISTS idx_fan_zones_city ON public.fan_zones(city);
 CREATE INDEX IF NOT EXISTS idx_fan_zones_team ON public.fan_zones(team_id);
 CREATE INDEX IF NOT EXISTS idx_fan_zones_location ON public.fan_zones(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_fan_zones_active ON public.fan_zones(is_active);
+
+-- =============================================================================
+-- COMMUNITY THREADS TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.threads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL CHECK (char_length(title) >= 3 AND char_length(title) <= 200),
+  content TEXT,
+  author_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  category TEXT DEFAULT 'general',
+  is_pinned BOOLEAN DEFAULT false,
+  is_locked BOOLEAN DEFAULT false,
+  views_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.threads ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can view threads
+CREATE POLICY "Threads are viewable by everyone"
+  ON public.threads FOR SELECT USING (true);
+
+-- Only authenticated users can create threads
+CREATE POLICY "Authenticated users can create threads"
+  ON public.threads FOR INSERT WITH CHECK (auth.uid() = author_id);
+
+-- Users can update their own threads
+CREATE POLICY "Users can update own threads"
+  ON public.threads FOR UPDATE
+  USING (auth.uid() = author_id)
+  WITH CHECK (auth.uid() = author_id);
+
+-- Users can delete their own threads
+CREATE POLICY "Users can delete own threads"
+  ON public.threads FOR DELETE USING (auth.uid() = author_id);
+
+DROP TRIGGER IF EXISTS update_threads_updated_at ON public.threads;
+CREATE TRIGGER update_threads_updated_at
+  BEFORE UPDATE ON public.threads
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =============================================================================
+-- THREAD POSTS (REPLIES) TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.thread_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  thread_id UUID REFERENCES public.threads(id) ON DELETE CASCADE NOT NULL,
+  author_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  content TEXT NOT NULL CHECK (char_length(content) >= 1 AND char_length(content) <= 5000),
+  is_solution BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.thread_posts ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can view posts
+CREATE POLICY "Posts are viewable by everyone"
+  ON public.thread_posts FOR SELECT USING (true);
+
+-- Only authenticated users can create posts
+CREATE POLICY "Authenticated users can create posts"
+  ON public.thread_posts FOR INSERT WITH CHECK (auth.uid() = author_id);
+
+-- Users can update their own posts
+CREATE POLICY "Users can update own posts"
+  ON public.thread_posts FOR UPDATE
+  USING (auth.uid() = author_id)
+  WITH CHECK (auth.uid() = author_id);
+
+-- Users can delete their own posts
+CREATE POLICY "Users can delete own posts"
+  ON public.thread_posts FOR DELETE USING (auth.uid() = author_id);
+
+DROP TRIGGER IF EXISTS update_posts_updated_at ON public.thread_posts;
+CREATE TRIGGER update_posts_updated_at
+  BEFORE UPDATE ON public.thread_posts
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =============================================================================
+-- LIKES/UPVOTES TABLE
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.likes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  thread_id UUID REFERENCES public.threads(id) ON DELETE CASCADE,
+  post_id UUID REFERENCES public.thread_posts(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  -- Either thread_id or post_id must be set, but not both
+  CONSTRAINT likes_target_check CHECK (
+    (thread_id IS NOT NULL AND post_id IS NULL) OR
+    (thread_id IS NULL AND post_id IS NOT NULL)
+  ),
+  -- One like per user per target
+  UNIQUE(user_id, thread_id),
+  UNIQUE(user_id, post_id)
+);
+
+ALTER TABLE public.likes ENABLE ROW LEVEL SECURITY;
+
+-- Everyone can view likes count
+CREATE POLICY "Likes are viewable by everyone"
+  ON public.likes FOR SELECT USING (true);
+
+-- Only authenticated users can like
+CREATE POLICY "Authenticated users can like"
+  ON public.likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Users can remove their own likes
+CREATE POLICY "Users can remove own likes"
+  ON public.likes FOR DELETE USING (auth.uid() = user_id);
+
+-- =============================================================================
+-- INDEXES
+-- =============================================================================
+CREATE INDEX IF NOT EXISTS idx_threads_author ON public.threads(author_id);
+CREATE INDEX IF NOT EXISTS idx_threads_category ON public.threads(category);
+CREATE INDEX IF NOT EXISTS idx_threads_created ON public.threads(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_threads_pinned ON public.threads(is_pinned DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_posts_thread ON public.thread_posts(thread_id);
+CREATE INDEX IF NOT EXISTS idx_posts_author ON public.thread_posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created ON public.thread_posts(created_at);
+CREATE INDEX IF NOT EXISTS idx_likes_thread ON public.likes(thread_id);
+CREATE INDEX IF NOT EXISTS idx_likes_post ON public.likes(post_id);
+CREATE INDEX IF NOT EXISTS idx_likes_user ON public.likes(user_id);
