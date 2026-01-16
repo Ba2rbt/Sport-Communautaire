@@ -28,17 +28,33 @@ export default function FanZoneMap({
   // Initialize map on client side only
   useEffect(() => {
     if (typeof window === 'undefined' || !mapContainerRef.current) return
-    if (mapInstanceRef.current) return // Already initialized
+    
+    // Check if map is already initialized
+    if (mapInstanceRef.current) {
+      return
+    }
+
+    // Check if container already has a map (Leaflet adds _leaflet_id)
+    if ((mapContainerRef.current as any)._leaflet_id) {
+      return
+    }
+
+    let isMounted = true
 
     // Dynamic import of Leaflet
     const initMap = async () => {
       try {
         // Import Leaflet dynamically
         const L = await import('leaflet')
-        leafletRef.current = L.default
+        
+        if (!isMounted || !mapContainerRef.current) return
+        
+        // Double check after async import
+        if (mapInstanceRef.current || (mapContainerRef.current as any)._leaflet_id) {
+          return
+        }
 
-        // Import CSS
-        await import('leaflet/dist/leaflet.css')
+        leafletRef.current = L.default
 
         // Fix default icon paths
         delete (L.default.Icon.Default.prototype as any)._getIconUrl
@@ -49,7 +65,7 @@ export default function FanZoneMap({
         })
 
         // Create map
-        const map = L.default.map(mapContainerRef.current!).setView(center, zoom)
+        const map = L.default.map(mapContainerRef.current).setView(center, zoom)
         
         // Add OpenStreetMap tiles
         L.default.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -67,13 +83,15 @@ export default function FanZoneMap({
     initMap()
 
     return () => {
+      isMounted = false
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove()
         mapInstanceRef.current = null
+        leafletRef.current = null
         setIsMapReady(false)
       }
     }
-  }, [center, zoom])
+  }, [])
 
   // Add/update markers when map is ready or fanZones change
   useEffect(() => {
