@@ -1,0 +1,422 @@
+{
+  "name": "SportUnion - Sync Matches (Simple)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Cron 30min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "notes": "Exécute le workflow toutes les 30 minutes"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "61"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-ligue1",
+      "name": "API Ligue 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 100],
+      "notes": "League ID 61 = Ligue 1"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "39"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-premier-league",
+      "name": "API Premier League",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 250],
+      "notes": "League ID 39 = Premier League"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "140"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-la-liga",
+      "name": "API La Liga",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 400],
+      "notes": "League ID 140 = La Liga"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "135"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-serie-a",
+      "name": "API Serie A",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 550],
+      "notes": "League ID 135 = Serie A"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "78"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-bundesliga",
+      "name": "API Bundesliga",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 700],
+      "notes": "League ID 78 = Bundesliga"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://v3.football.api-sports.io/fixtures",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apisports-key",
+              "value": "VOTRE_API_KEY_ICI"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "league",
+              "value": "63"
+            },
+            {
+              "name": "season",
+              "value": "2024"
+            },
+            {
+              "name": "from",
+              "value": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.plus({ days: 7 }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "api-national",
+      "name": "API National",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 850],
+      "notes": "League ID 63 = National (France)"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-all",
+      "name": "Merge All",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [750, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse et transforme les données API-Football pour Supabase\nconst allMatches = [];\nconst allCompetitions = new Map();\n\nfor (const item of $input.all()) {\n  const response = item.json.response || [];\n  \n  for (const fixture of response) {\n    const { fixture: f, league, teams, goals } = fixture;\n    \n    // Mapping du status\n    let status = 'upcoming';\n    if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(f.status.short)) {\n      status = 'live';\n    } else if (['FT', 'AET', 'PEN', 'AWD', 'WO'].includes(f.status.short)) {\n      status = 'finished';\n    }\n    \n    // Date et heure\n    const matchDate = new Date(f.date);\n    const dateStr = matchDate.toISOString().split('T')[0];\n    const timeStr = matchDate.toTimeString().split(' ')[0].substring(0, 5);\n    \n    // Match\n    allMatches.push({\n      id: `api-${f.id}`,\n      team1: teams.home.name,\n      team2: teams.away.name,\n      score1: goals.home ?? 0,\n      score2: goals.away ?? 0,\n      status,\n      league: league.name,\n      image: league.logo || '',\n      date: dateStr,\n      time: timeStr,\n      stadium: f.venue?.name || null\n    });\n    \n    // Compétition\n    if (!allCompetitions.has(league.id)) {\n      const slug = league.name.toLowerCase()\n        .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n        .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');\n      \n      allCompetitions.set(league.id, {\n        id: slug,\n        name: league.name,\n        logo_url: league.logo,\n        country: league.country,\n        current_season: String(league.season)\n      });\n    }\n  }\n}\n\nreturn [{\n  json: {\n    matches: allMatches,\n    competitions: Array.from(allCompetitions.values()),\n    count: allMatches.length\n  }\n}];"
+      },
+      "id": "parse-json",
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [950, 400],
+      "notes": "Transforme les données API vers format Supabase"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://VOTRE_PROJECT_ID.supabase.co/rest/v1/competitions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "VOTRE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer VOTRE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.competitions) }}",
+        "options": {}
+      },
+      "id": "supabase-competitions",
+      "name": "Upsert Competitions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1200, 300],
+      "notes": "Insère ou met à jour les compétitions"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://VOTRE_PROJECT_ID.supabase.co/rest/v1/matches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "VOTRE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer VOTRE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.matches) }}",
+        "options": {}
+      },
+      "id": "supabase-matches",
+      "name": "Upsert Matches",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1200, 500],
+      "notes": "Insère ou met à jour les matches"
+    },
+    {
+      "parameters": {},
+      "id": "noop",
+      "name": "Done ✅",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "notes": "Workflow terminé avec succès"
+    }
+  ],
+  "connections": {
+    "Cron 30min": {
+      "main": [
+        [
+          { "node": "API Ligue 1", "type": "main", "index": 0 },
+          { "node": "API Premier League", "type": "main", "index": 0 },
+          { "node": "API La Liga", "type": "main", "index": 0 },
+          { "node": "API Serie A", "type": "main", "index": 0 },
+          { "node": "API Bundesliga", "type": "main", "index": 0 },
+          { "node": "API National", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "API Ligue 1": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "API Premier League": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "API La Liga": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "API Serie A": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "API Bundesliga": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "API National": { "main": [[{ "node": "Merge All", "type": "main", "index": 0 }]] },
+    "Merge All": { "main": [[{ "node": "Parse JSON", "type": "main", "index": 0 }]] },
+    "Parse JSON": { 
+      "main": [[
+        { "node": "Upsert Competitions", "type": "main", "index": 0 },
+        { "node": "Upsert Matches", "type": "main", "index": 0 }
+      ]] 
+    },
+    "Upsert Competitions": { "main": [[{ "node": "Done ✅", "type": "main", "index": 0 }]] },
+    "Upsert Matches": { "main": [[{ "node": "Done ✅", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {}
+}

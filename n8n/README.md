@@ -2,80 +2,82 @@
 
 Workflow n8n pour synchroniser les données de matchs depuis API-Football vers Supabase.
 
+## 📁 Fichiers disponibles
+
+| Fichier | Description |
+|---------|-------------|
+| `sportunion-sync-simple.json` | ✅ **Recommandé** - Version simple, clés directement dans les nœuds |
+| `sportunion-sync-workflow.json` | Version avancée avec credentials séparés + Discord |
+
 ## 📋 Fonctionnalités
 
 - ⏰ **Cron 30min** : Exécution automatique toutes les 30 minutes
 - ⚽ **6 championnats** : Ligue 1, Premier League, La Liga, Serie A, Bundesliga, National
 - 🔄 **Upsert intelligent** : Mise à jour ou création des données
-- 📊 **Parse complet** : Matches, équipes, compétitions
-- 🔔 **Notifications Discord** : Succès et erreurs
+- 📊 **Parse complet** : Matches, compétitions
 
-## 🚀 Installation
+## 🚀 Installation (Version Simple)
 
 ### 1. Importer le workflow
 
 1. Ouvrir n8n
-2. Aller dans **Workflows** → **Import from File**
-3. Sélectionner `sportunion-sync-workflow.json`
+2. **Workflows** → **Import from File**
+3. Sélectionner `sportunion-sync-simple.json`
 
-### 2. Configurer les credentials
+### 2. Configurer (3 valeurs à remplacer)
 
-#### API-Football
+Ouvrir chaque nœud et remplacer les valeurs :
 
-1. Créer un compte sur [api-football.com](https://www.api-football.com/)
-2. Dans n8n : **Credentials** → **New** → **Header Auth**
-3. Configurer :
-   - **Name**: `API-Football`
-   - **Header Name**: `x-apisports-key`
-   - **Header Value**: `VOTRE_API_KEY`
+#### 🔑 API-Football (6 nœuds API)
 
-#### Supabase
+Remplacer `VOTRE_API_KEY_ICI` par votre clé API-Football.
 
-1. Dans n8n : **Credentials** → **New** → **Supabase API**
-2. Configurer :
-   - **Name**: `Supabase SportUnion`
-   - **Host**: `https://votre-projet.supabase.co`
-   - **Service Role Key**: Votre clé `service_role` (pas anon!)
+**Obtenir la clé** : https://www.api-football.com/ → Dashboard → API Key
 
-#### Discord Webhook
+#### 🗄️ Supabase (2 nœuds Upsert)
 
-1. Dans Discord : **Paramètres serveur** → **Intégrations** → **Webhooks** → **Nouveau webhook**
-2. Copier l'URL du webhook
-3. Dans n8n : **Credentials** → **New** → **Query Auth**
-4. Configurer :
-   - **Name**: `Discord Webhook`
-   - **Parameter Name**: `webhookUrl`
-   - **Parameter Value**: `URL_DU_WEBHOOK`
+Remplacer dans l'URL et les headers :
+- `VOTRE_PROJECT_ID` → votre project ID (ex: `abcdefghijk`)
+- `VOTRE_SERVICE_ROLE_KEY` → votre clé `service_role`
 
-### 3. Mettre à jour les IDs de credentials
+**Obtenir les infos** : Supabase Dashboard → Project Settings → API
+- Project URL : `https://abcdefghijk.supabase.co`
+- Service Role Key : `eyJhbGci...` (la longue clé, PAS anon!)
 
-Dans le workflow importé, remplacer :
-- `API_FOOTBALL_CREDENTIAL_ID` → ID de votre credential API-Football
-- `SUPABASE_CREDENTIAL_ID` → ID de votre credential Supabase
-- `DISCORD_WEBHOOK_CREDENTIAL_ID` → ID de votre credential Discord
+### 3. Tester
+
+1. Cliquer sur **Execute Workflow** (bouton play)
+2. Vérifier que les données arrivent dans Supabase
+
+### 4. Activer
+
+1. Cliquer sur **Active** (toggle en haut à droite)
+2. Le workflow s'exécutera automatiquement toutes les 30 minutes
 
 ## 📊 Données synchronisées
 
 ### Table `matches`
+
 ```sql
 id, team1, team2, score1, score2, status, league, image, date, time, stadium
 ```
 
 ### Table `competitions`
+
 ```sql
 id, name, logo_url, country, current_season
 ```
 
 ## 🏆 Championnats (League IDs API-Football)
 
-| Championnat | ID |
-|------------|-----|
-| Ligue 1 | 61 |
-| Premier League | 39 |
-| La Liga | 140 |
-| Serie A | 135 |
-| Bundesliga | 78 |
-| National | 63 |
+| Championnat    | ID  |
+| -------------- | --- |
+| Ligue 1        | 61  |
+| Premier League | 39  |
+| La Liga        | 140 |
+| Serie A        | 135 |
+| Bundesliga     | 78  |
+| National       | 63  |
 
 ## ⚙️ Personnalisation
 
@@ -93,26 +95,31 @@ id, name, logo_url, country, current_season
 ### Étendre la plage de dates
 
 Dans les nœuds API, modifier :
+
 - `from`: `$now.minus({ days: X })`
 - `to`: `$now.plus({ days: Y })`
 
 ## 🔧 Dépannage
 
 ### Erreur "Rate limit"
+
 - API-Football a des limites selon votre plan
 - Réduire la fréquence du cron ou le nombre de championnats
 
 ### Erreur Supabase "permission denied"
+
 - Utiliser la clé `service_role`, pas `anon`
 - Vérifier les policies RLS
 
 ### Pas de données
+
 - Vérifier que la saison est correcte (2024 = saison 2024-25)
 - Certains championnats peuvent être en trêve
 
 ## 📝 Logs Discord
 
 ### Succès
+
 ```
 ✅ SportUnion Sync Complete
 📊 Matches: 45
@@ -121,6 +128,7 @@ Dans les nœuds API, modifier :
 ```
 
 ### Erreur
+
 ```
 ❌ SportUnion Sync Error
 🔴 Node: Upsert Matches
