@@ -1,4 +1,8 @@
+'use client'
+
+import Link from 'next/link'
 import { BadgeLive, TagLigue } from './ui'
+import { TeamLink } from './ui/TeamLink'
 
 export interface MatchData {
   id: string
@@ -33,7 +37,7 @@ export default function MatchCardLarge({ match }: MatchCardLargeProps) {
   const isUpcoming = match.status === 'upcoming'
 
   return (
-    <article className="group bg-white border border-editorial rounded-lg overflow-hidden hover-lift cursor-pointer transition-all duration-300">
+    <article className="group bg-white border border-editorial rounded-lg overflow-hidden hover-lift transition-all duration-300">
       {/* Header with League */}
       <div className="px-5 py-3 border-b border-editorial bg-secondary/30 flex items-center justify-between">
         <TagLigue league={match.league} className="text-xs" />
@@ -56,19 +60,19 @@ export default function MatchCardLarge({ match }: MatchCardLargeProps) {
         <div className="space-y-4">
           {/* Home Team */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-3xl flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+            <TeamLink teamName={match.homeTeam.name} className="flex items-center gap-4 flex-1 min-w-0 group/team">
+              <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-3xl flex-shrink-0 shadow-sm group-hover/team:scale-105 transition-transform">
                 {match.homeTeam.logo}
               </div>
               <div className="min-w-0">
-                <h3 className="font-semibold text-primary text-lg truncate group-hover:text-accent-sport transition-colors">
+                <h3 className="font-semibold text-primary text-lg truncate group-hover/team:text-accent-sport transition-colors">
                   {match.homeTeam.name}
                 </h3>
                 <span className="text-xs text-muted uppercase tracking-wider">
                   {match.homeTeam.shortName}
                 </span>
               </div>
-            </div>
+            </TeamLink>
             {/* Score */}
             {!isUpcoming && (
               <div className={`
@@ -89,19 +93,19 @@ export default function MatchCardLarge({ match }: MatchCardLargeProps) {
 
           {/* Away Team */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-3xl flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+            <TeamLink teamName={match.awayTeam.name} className="flex items-center gap-4 flex-1 min-w-0 group/team">
+              <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-3xl flex-shrink-0 shadow-sm group-hover/team:scale-105 transition-transform">
                 {match.awayTeam.logo}
               </div>
               <div className="min-w-0">
-                <h3 className="font-semibold text-primary text-lg truncate group-hover:text-accent-sport transition-colors">
+                <h3 className="font-semibold text-primary text-lg truncate group-hover/team:text-accent-sport transition-colors">
                   {match.awayTeam.name}
                 </h3>
                 <span className="text-xs text-muted uppercase tracking-wider">
                   {match.awayTeam.shortName}
                 </span>
               </div>
-            </div>
+            </TeamLink>
             {/* Score */}
             {!isUpcoming && (
               <div className={`
@@ -147,16 +151,21 @@ export default function MatchCardLarge({ match }: MatchCardLargeProps) {
           {match.round && (
             <span className="text-xs text-muted">{match.round}</span>
           )}
-          <div className="w-8 h-8 rounded-full bg-accent-sport/10 flex items-center justify-center group-hover:bg-accent-sport transition-colors">
+          
+          {/* Link to match details */}
+          <Link
+            href={`/match/${match.id}`}
+            className="w-8 h-8 rounded-full bg-accent-sport/10 flex items-center justify-center hover:bg-accent-sport transition-colors"
+          >
             <svg
-              className="w-4 h-4 text-accent-sport group-hover:text-white transition-colors"
+              className="w-4 h-4 text-accent-sport hover:text-white transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </div>
+          </Link>
         </div>
       </div>
     </article>

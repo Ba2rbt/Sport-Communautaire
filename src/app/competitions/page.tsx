@@ -1,173 +1,177 @@
 import Link from 'next/link'
-import type { Competition } from '@/types/competition'
+import { createClient } from '@/lib/supabase/server'
+import { TagLigue } from '@/components/ui'
 
-// Mock data for competitions list
-const mockCompetitions: Competition[] = [
-  {
-    id: 'ligue-1',
-    name: 'Ligue 1 Uber Eats',
-    shortName: 'L1',
-    logo: '🇫🇷',
-    country: 'France',
-    description: 'Le championnat de France de football',
-    season: '2025-2026',
-    startDate: '2025-08-09',
-    endDate: '2026-05-23',
-    totalTeams: 18,
-    totalMatches: 306,
-    totalGoals: 547,
-    isActive: true,
-  },
-  {
-    id: 'premier-league',
-    name: 'Premier League',
-    shortName: 'PL',
-    logo: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    country: 'Angleterre',
-    description: 'Le championnat anglais de football',
-    season: '2025-2026',
-    startDate: '2025-08-16',
-    endDate: '2026-05-24',
-    totalTeams: 20,
-    totalMatches: 380,
-    totalGoals: 612,
-    isActive: true,
-  },
-  {
-    id: 'la-liga',
-    name: 'La Liga',
-    shortName: 'LL',
-    logo: '🇪🇸',
-    country: 'Espagne',
-    description: 'Le championnat espagnol de football',
-    season: '2025-2026',
-    startDate: '2025-08-18',
-    endDate: '2026-05-31',
-    totalTeams: 20,
-    totalMatches: 380,
-    totalGoals: 589,
-    isActive: true,
-  },
-  {
-    id: 'serie-a',
-    name: 'Serie A',
-    shortName: 'SA',
-    logo: '🇮🇹',
-    country: 'Italie',
-    description: 'Le championnat italien de football',
-    season: '2025-2026',
-    startDate: '2025-08-17',
-    endDate: '2026-05-25',
-    totalTeams: 20,
-    totalMatches: 380,
-    totalGoals: 534,
-    isActive: true,
-  },
-  {
-    id: 'bundesliga',
-    name: 'Bundesliga',
-    shortName: 'BL',
-    logo: '🇩🇪',
-    country: 'Allemagne',
-    description: 'Le championnat allemand de football',
-    season: '2025-2026',
-    startDate: '2025-08-23',
-    endDate: '2026-05-17',
-    totalTeams: 18,
-    totalMatches: 306,
-    totalGoals: 498,
-    isActive: true,
-  },
-  {
-    id: 'champions-league',
-    name: 'UEFA Champions League',
-    shortName: 'UCL',
-    logo: '⭐',
-    country: 'Europe',
-    description: 'La plus prestigieuse compétition européenne',
-    season: '2025-2026',
-    startDate: '2025-09-17',
-    endDate: '2026-05-30',
-    totalTeams: 36,
-    totalMatches: 189,
-    totalGoals: 312,
-    isActive: true,
-  },
-]
-
-function CompetitionCard({ competition }: { competition: Competition }) {
-  return (
-    <Link 
-      href={`/competitions/${competition.id}`}
-      className="block bg-white border border-editorial rounded-lg overflow-hidden hover-lift"
-    >
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-4">
-          <span className="text-5xl">{competition.logo}</span>
-          <div>
-            <h3 className="font-editorial text-xl font-bold text-primary">
-              {competition.name}
-            </h3>
-            <p className="text-sm text-muted">{competition.country} • {competition.season}</p>
-          </div>
-        </div>
-        <p className="text-muted text-sm mb-4 line-clamp-2">
-          {competition.description}
-        </p>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="px-3 py-1 bg-secondary rounded-full text-muted">
-            {competition.totalTeams} équipes
-          </span>
-          <span className="px-3 py-1 bg-accent-live/10 text-accent-live rounded-full font-medium">
-            {competition.totalGoals} buts
-          </span>
-        </div>
-      </div>
-    </Link>
-  )
-}
+export const revalidate = 60
 
 export const metadata = {
   title: 'Compétitions | SportUnion',
-  description: 'Suivez toutes les compétitions de football : Ligue 1, Premier League, La Liga, Serie A, Bundesliga et Champions League.',
+  description: 'Suivez tous les championnats de football : Ligue 1, Premier League, La Liga, Serie A, Bundesliga et plus.',
 }
 
-export default function CompetitionsPage() {
+interface Competition {
+  id: string
+  name: string
+  logo_url: string | null
+  country: string | null
+  current_season: string | null
+}
+
+export default async function CompetitionsPage() {
+  const supabase = await createClient()
+  
+  const { data: competitions, error } = await supabase
+    .from('competitions')
+    .select('*')
+    .order('name', { ascending: true })
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="font-editorial text-5xl font-bold text-primary mb-4">
-          Compétitions
-        </h1>
-        <p className="text-muted text-lg max-w-2xl mx-auto">
-          Suivez les classements, calendriers et statistiques de toutes les grandes compétitions de football.
-        </p>
-      </div>
-
-      {/* Featured */}
-      <section>
-        <h2 className="font-editorial text-2xl font-bold text-primary mb-6">
-          Championnats majeurs
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockCompetitions.slice(0, 5).map((competition) => (
-            <CompetitionCard key={competition.id} competition={competition} />
-          ))}
+    <div className="min-h-screen bg-secondary">
+      {/* Page Header */}
+      <header className="bg-white border-b border-editorial">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
+            Football
+          </span>
+          <h1 className="font-editorial text-4xl md:text-5xl font-bold text-primary mb-4">
+            Compétitions
+          </h1>
+          <p className="text-muted text-lg max-w-2xl">
+            Suivez les classements, calendriers et statistiques de tous les championnats majeurs.
+          </p>
         </div>
-      </section>
+      </header>
 
-      {/* European */}
-      <section>
-        <h2 className="font-editorial text-2xl font-bold text-primary mb-6">
-          Coupes européennes
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockCompetitions.slice(5).map((competition) => (
-            <CompetitionCard key={competition.id} competition={competition} />
-          ))}
-        </div>
-      </section>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <p className="text-red-600">Erreur lors du chargement des compétitions</p>
+            <p className="text-red-400 text-sm mt-1">{error.message}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!error && (!competitions || competitions.length === 0) && (
+          <div className="bg-white border border-editorial rounded-lg p-16 text-center">
+            <span className="text-7xl mb-6 block">🏆</span>
+            <h3 className="font-editorial text-2xl font-bold text-primary mb-3">
+              Aucune compétition disponible
+            </h3>
+            <p className="text-muted max-w-md mx-auto">
+              Les compétitions seront synchronisées automatiquement via le workflow n8n.
+              Assurez-vous que le workflow est activé et que les tables Supabase sont créées.
+            </p>
+          </div>
+        )}
+
+        {/* Competitions Grid */}
+        {competitions && competitions.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {competitions.map((competition: Competition) => (
+              <Link 
+                key={competition.id} 
+                href={`/competitions/${competition.id}`}
+                className="group"
+              >
+                <article className="bg-white border border-editorial rounded-lg overflow-hidden hover-lift transition-all duration-300">
+                  {/* Header with Logo */}
+                  <div className="bg-gradient-to-br from-primary to-primary/90 p-8 relative overflow-hidden">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl" />
+                    </div>
+                    
+                    <div className="relative flex items-center gap-4">
+                      {/* Logo */}
+                      <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        {competition.logo_url ? (
+                          <img 
+                            src={competition.logo_url} 
+                            alt={competition.name}
+                            className="w-10 h-10 object-contain"
+                          />
+                        ) : (
+                          <span className="text-3xl">🏆</span>
+                        )}
+                      </div>
+                      
+                      {/* Name */}
+                      <div>
+                        <h2 className="font-editorial text-xl font-bold text-white group-hover:text-accent-sport transition-colors">
+                          {competition.name}
+                        </h2>
+                        {competition.country && (
+                          <p className="text-white/70 text-sm mt-1">
+                            {competition.country}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between">
+                      <TagLigue league={competition.name} isActive={false} />
+                      
+                      {competition.current_season && (
+                        <span className="text-sm text-muted">
+                          Saison {competition.current_season}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* CTA */}
+                    <div className="mt-6 flex items-center justify-between">
+                      <span className="text-sm font-medium text-accent-sport group-hover:underline">
+                        Voir le classement
+                      </span>
+                      <svg 
+                        className="w-4 h-4 text-accent-sport transform group-hover:translate-x-1 transition-transform" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Info Section */}
+        <section className="mt-16 bg-white border border-editorial rounded-lg p-8">
+          <h2 className="font-editorial text-2xl font-bold text-primary mb-4">
+            Compétitions suivies
+          </h2>
+          <p className="text-muted mb-6">
+            SportUnion synchronise automatiquement les données des principales compétitions européennes :
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { name: 'Ligue 1', country: '🇫🇷' },
+              { name: 'Premier League', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+              { name: 'La Liga', country: '🇪🇸' },
+              { name: 'Serie A', country: '🇮🇹' },
+              { name: 'Bundesliga', country: '🇩🇪' },
+              { name: 'National', country: '🇫🇷' },
+            ].map((league) => (
+              <div 
+                key={league.name}
+                className="flex items-center gap-2 p-3 bg-secondary rounded-lg"
+              >
+                <span className="text-xl">{league.country}</span>
+                <span className="text-sm font-medium text-primary">{league.name}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
     </div>
   )
 }

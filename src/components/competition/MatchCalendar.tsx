@@ -1,19 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, MouseEvent } from 'react'
 import type { CompetitionMatch } from '@/types/competition'
 import { BadgeLive } from '@/components/ui'
 import Link from 'next/link'
+import { getTeamSlug } from '@/lib/utils'
 
 interface MatchCalendarProps {
   matches: CompetitionMatch[]
   competitionId: string
 }
 
+function TeamLink({ teamName, shortName, logo, onClick }: { 
+  teamName: string
+  shortName: string
+  logo: string
+  onClick: (e: MouseEvent) => void
+}) {
+  const slug = getTeamSlug(teamName)
+  
+  return (
+    <Link 
+      href={`/team/${slug}`}
+      onClick={onClick}
+      className="flex items-center gap-3 group/team"
+    >
+      <span className="w-8 h-8 flex items-center justify-center text-xl group-hover/team:scale-110 transition-transform">
+        {logo}
+      </span>
+      <span className="font-medium text-primary group-hover/team:text-accent-sport transition-colors">
+        {shortName}
+      </span>
+    </Link>
+  )
+}
+
 function MatchCard({ match }: { match: CompetitionMatch }) {
   const isLive = match.status === 'live'
   const isFinished = match.status === 'finished'
   const isUpcoming = match.status === 'upcoming'
+
+  const handleTeamClick = (e: MouseEvent) => {
+    e.stopPropagation()
+  }
 
   return (
     <Link 
@@ -36,12 +65,12 @@ function MatchCard({ match }: { match: CompetitionMatch }) {
       <div className="p-4">
         {/* Home Team */}
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 flex items-center justify-center text-xl">
-              {match.homeTeam.logo}
-            </span>
-            <span className="font-medium text-primary">{match.homeTeam.shortName}</span>
-          </div>
+          <TeamLink 
+            teamName={match.homeTeam.name}
+            shortName={match.homeTeam.shortName}
+            logo={match.homeTeam.logo}
+            onClick={handleTeamClick}
+          />
           <span className={`
             text-xl font-bold
             ${isLive ? 'text-accent-live' : 'text-primary'}
@@ -52,12 +81,12 @@ function MatchCard({ match }: { match: CompetitionMatch }) {
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 flex items-center justify-center text-xl">
-              {match.awayTeam.logo}
-            </span>
-            <span className="font-medium text-primary">{match.awayTeam.shortName}</span>
-          </div>
+          <TeamLink 
+            teamName={match.awayTeam.name}
+            shortName={match.awayTeam.shortName}
+            logo={match.awayTeam.logo}
+            onClick={handleTeamClick}
+          />
           <span className={`
             text-xl font-bold
             ${isLive ? 'text-accent-live' : 'text-primary'}

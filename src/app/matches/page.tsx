@@ -1,92 +1,60 @@
 import { Suspense } from 'react'
+import { createClient } from '@/lib/supabase/server'
 import MatchesFilters from '@/components/MatchesFilters'
 import MatchesGrid from '@/components/MatchesGrid'
 import { MatchGridSkeleton, SidebarSkeleton } from '@/components/ui/Skeleton'
 import { BadgeLive } from '@/components/ui'
 import type { MatchData } from '@/components/MatchCardLarge'
 
-// Mock initial matches data
-// In production, this would fetch from Supabase
-const mockMatches: MatchData[] = [
-  {
-    id: '1',
-    homeTeam: { name: 'Paris Saint-Germain', shortName: 'PSG', logo: '🔵' },
-    awayTeam: { name: 'Olympique de Marseille', shortName: 'OM', logo: '⚪' },
-    homeScore: 2,
-    awayScore: 1,
-    date: '13 Jan',
-    time: '21:00',
-    league: 'Ligue 1',
-    venue: 'Parc des Princes',
-    status: 'live',
-    minute: 67,
-    round: 'Journée 18',
-  },
-  {
-    id: '2',
-    homeTeam: { name: 'FC Barcelona', shortName: 'FCB', logo: '🔴' },
-    awayTeam: { name: 'Real Madrid', shortName: 'RMA', logo: '⚪' },
-    date: '15 Jan',
-    time: '21:00',
-    league: 'La Liga',
-    venue: 'Camp Nou',
-    status: 'upcoming',
-    round: 'Journée 20',
-  },
-  {
-    id: '3',
-    homeTeam: { name: 'Manchester City', shortName: 'MCI', logo: '🩵' },
-    awayTeam: { name: 'Liverpool FC', shortName: 'LIV', logo: '🔴' },
-    date: '16 Jan',
-    time: '18:30',
-    league: 'Premier League',
-    venue: 'Etihad Stadium',
-    status: 'upcoming',
-    round: 'Journée 22',
-  },
-  {
-    id: '4',
-    homeTeam: { name: 'Juventus', shortName: 'JUV', logo: '⚫' },
-    awayTeam: { name: 'AC Milan', shortName: 'ACM', logo: '🔴' },
-    homeScore: 1,
-    awayScore: 1,
-    date: '12 Jan',
-    time: '20:45',
-    league: 'Serie A',
-    venue: 'Allianz Stadium',
-    status: 'finished',
-    round: 'Journée 19',
-  },
-  {
-    id: '5',
-    homeTeam: { name: 'Bayern Munich', shortName: 'BAY', logo: '🔴' },
-    awayTeam: { name: 'Borussia Dortmund', shortName: 'BVB', logo: '🟡' },
-    homeScore: 3,
-    awayScore: 2,
-    date: '12 Jan',
-    time: '18:30',
-    league: 'Bundesliga',
-    venue: 'Allianz Arena',
-    status: 'finished',
-    round: 'Journée 17',
-  },
-  {
-    id: '6',
-    homeTeam: { name: 'OL Lyon', shortName: 'OL', logo: '🔵' },
-    awayTeam: { name: 'AS Monaco', shortName: 'ASM', logo: '🔴' },
-    date: '18 Jan',
-    time: '17:00',
-    league: 'Ligue 1',
-    venue: 'Groupama Stadium',
-    status: 'upcoming',
-    round: 'Journée 18',
-  },
-]
+// Transform Supabase data to MatchData format
+function transformMatch(match: any): MatchData {
+  const matchDate = new Date(`${match.date}T${match.time || '00:00'}`)
+  
+  return {
+    id: match.id,
+    homeTeam: { 
+      name: match.team1, 
+      shortName: match.team1.substring(0, 3).toUpperCase(), 
+      logo: '⚽' 
+    },
+    awayTeam: { 
+      name: match.team2, 
+      shortName: match.team2.substring(0, 3).toUpperCase(), 
+      logo: '⚽' 
+    },
+    homeScore: match.score1 || 0,
+    awayScore: match.score2 || 0,
+    date: matchDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+    time: match.time?.substring(0, 5) || '00:00',
+    league: match.league,
+    venue: match.stadium || '',
+    status: match.status as 'live' | 'upcoming' | 'finished',
+    minute: match.status === 'live' ? 45 : undefined,
+    round: '',
+  }
+}
 
-// Count live matches
-const liveMatchesCount = mockMatches.filter(m => m.status === 'live').length
+export const revalidate = 60 // Revalidate every 60 seconds
 
-export default function MatchesPage() {
+export default async function MatchesPage() {
+  const supabase = await createClient()
+  
+  // Fetch matches from Supabase
+  const { data: matches, error } = await supabase
+    .from('matches')
+    .select('*')
+    .order('date', { ascending: true })
+    .order('time', { ascending: true })
+    .limit(50)
+
+  // Transform to MatchData format
+  const matchesData: MatchData[] = matches?.map(transformMatch) || []
+
+  // Count by status
+  const liveMatchesCount = matchesData.filter(m => m.status === 'live').length
+  const upcomingCount = matchesData.filter(m => m.status === 'upcoming').length
+  const finishedCount = matchesData.filter(m => m.status === 'finished').length
+
   return (
     <div className="min-h-screen bg-secondary">
       {/* Page Header */}
@@ -118,12 +86,12 @@ export default function MatchesPage() {
               </div>
               <div className="w-px h-10 bg-editorial" />
               <div className="text-center">
-                <p className="font-editorial text-2xl font-bold text-primary">24</p>
+                <p className="font-editorial text-2xl font-bold text-primary">{upcomingCount}</p>
                 <p className="text-xs text-muted uppercase tracking-wider">À venir</p>
               </div>
               <div className="w-px h-10 bg-editorial" />
               <div className="text-center">
-                <p className="font-editorial text-2xl font-bold text-primary">156</p>
+                <p className="font-editorial text-2xl font-bold text-primary">{finishedCount}</p>
                 <p className="text-xs text-muted uppercase tracking-wider">Terminés</p>
               </div>
             </div>
@@ -148,7 +116,7 @@ export default function MatchesPage() {
             {/* Results Info */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-sm text-muted">
-                <span className="font-semibold text-primary">{mockMatches.length}</span> matches affichés
+                <span className="font-semibold text-primary">{matchesData.length}</span> matches affichés
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted">Trier par:</span>
@@ -160,14 +128,37 @@ export default function MatchesPage() {
               </div>
             </div>
 
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p className="text-red-600">Erreur lors du chargement des matches</p>
+                <p className="text-red-400 text-sm mt-1">{error.message}</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!error && matchesData.length === 0 && (
+              <div className="bg-white border border-editorial rounded-lg p-12 text-center">
+                <span className="text-6xl mb-4 block">⚽</span>
+                <h3 className="font-editorial text-2xl font-bold text-primary mb-2">
+                  Aucun match disponible
+                </h3>
+                <p className="text-muted">
+                  Les matches seront synchronisés automatiquement.
+                </p>
+              </div>
+            )}
+
             {/* Grid with Infinite Scroll */}
-            <Suspense fallback={<MatchGridSkeleton count={6} />}>
-              <MatchesGrid 
-                initialMatches={mockMatches} 
-                initialHasMore={true}
-                pageSize={6}
-              />
-            </Suspense>
+            {matchesData.length > 0 && (
+              <Suspense fallback={<MatchGridSkeleton count={6} />}>
+                <MatchesGrid 
+                  initialMatches={matchesData} 
+                  initialHasMore={matchesData.length >= 50}
+                  pageSize={6}
+                />
+              </Suspense>
+            )}
           </div>
         </div>
       </main>

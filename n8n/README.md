@@ -4,10 +4,10 @@ Workflow n8n pour synchroniser les données de matchs depuis API-Football vers S
 
 ## 📁 Fichiers disponibles
 
-| Fichier | Description |
-|---------|-------------|
-| `sportunion-sync-simple.json` | ✅ **Recommandé** - Version simple, clés directement dans les nœuds |
-| `sportunion-sync-workflow.json` | Version avancée avec credentials séparés + Discord |
+| Fichier                         | Description                                                         |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `sportunion-sync-simple.json`   | ✅ **Recommandé** - Version simple, clés directement dans les nœuds |
+| `sportunion-sync-workflow.json` | Version avancée avec credentials séparés + Discord                  |
 
 ## 📋 Fonctionnalités
 
@@ -37,10 +37,12 @@ Remplacer `VOTRE_API_KEY_ICI` par votre clé API-Football.
 #### 🗄️ Supabase (2 nœuds Upsert)
 
 Remplacer dans l'URL et les headers :
+
 - `VOTRE_PROJECT_ID` → votre project ID (ex: `abcdefghijk`)
 - `VOTRE_SERVICE_ROLE_KEY` → votre clé `service_role`
 
 **Obtenir les infos** : Supabase Dashboard → Project Settings → API
+
 - Project URL : `https://abcdefghijk.supabase.co`
 - Service Role Key : `eyJhbGci...` (la longue clé, PAS anon!)
 

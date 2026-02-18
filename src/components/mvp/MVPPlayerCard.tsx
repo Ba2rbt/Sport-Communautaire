@@ -1,7 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import type { MVPRanking } from '@/types/mvp'
 import { positionLabels } from '@/types/mvp'
+import { getPlayerSlug, getTeamSlug } from '@/lib/utils'
 
 interface MVPPlayerCardProps {
   player: MVPRanking
@@ -40,6 +42,8 @@ export default function MVPPlayerCard({
   hasVoted = false 
 }: MVPPlayerCardProps) {
   const position = positionLabels[player.position]
+  const playerSlug = getPlayerSlug(player.playerName)
+  const teamSlug = getTeamSlug(player.teamName)
 
   return (
     <div className={`
@@ -50,16 +54,16 @@ export default function MVPPlayerCard({
       {/* Rank */}
       <RankBadge rank={player.rank} />
 
-      {/* Photo */}
-      <div className="relative flex-shrink-0">
+      {/* Photo - Clickable */}
+      <Link href={`/player/${playerSlug}`} className="relative flex-shrink-0 group/photo">
         {player.photoUrl ? (
           <img 
             src={player.photoUrl} 
             alt={player.playerName}
-            className="w-14 h-14 rounded-full object-cover border-2 border-editorial"
+            className="w-14 h-14 rounded-full object-cover border-2 border-editorial group-hover/photo:scale-105 group-hover/photo:border-accent-sport transition-all"
           />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent-sport flex items-center justify-center border-2 border-editorial">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent-sport flex items-center justify-center border-2 border-editorial group-hover/photo:scale-105 transition-transform">
             <span className="font-bold text-white text-lg">
               {player.jerseyNumber || player.playerName[0]}
             </span>
@@ -71,14 +75,17 @@ export default function MVPPlayerCard({
             {player.jerseyNumber}
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-editorial font-bold text-primary truncate">
-            {player.playerName}
-          </h3>
+          {/* Player Name - Clickable */}
+          <Link href={`/player/${playerSlug}`}>
+            <h3 className="font-editorial font-bold text-primary truncate hover:text-accent-sport transition-colors">
+              {player.playerName}
+            </h3>
+          </Link>
           {player.rank <= 3 && (
             <span className="flex-shrink-0 text-accent-mvp">
               {player.rank === 1 ? '👑' : '⭐'}
@@ -89,7 +96,12 @@ export default function MVPPlayerCard({
           {player.teamLogoUrl && (
             <img src={player.teamLogoUrl} alt={player.teamName} className="w-4 h-4" />
           )}
-          <span className="text-muted truncate">{player.teamName}</span>
+          {/* Team Name - Clickable */}
+          <Link href={`/team/${teamSlug}`}>
+            <span className="text-muted truncate hover:text-accent-sport transition-colors">
+              {player.teamName}
+            </span>
+          </Link>
           <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${position?.color || 'bg-muted text-white'}`}>
             {position?.label || player.position}
           </span>

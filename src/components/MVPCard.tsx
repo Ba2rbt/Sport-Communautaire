@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import type { MVP } from '@/types'
 import { BadgeMVP } from './ui'
+import { getPlayerSlug, getTeamSlug } from '@/lib/utils'
 
 interface MVPCardProps {
   mvp: MVP
@@ -7,8 +9,11 @@ interface MVPCardProps {
 }
 
 export default function MVPCard({ mvp, rank }: MVPCardProps) {
+  const playerSlug = getPlayerSlug(mvp.name)
+  const teamSlug = getTeamSlug(mvp.team)
+
   return (
-    <article className="group relative bg-white border border-editorial rounded-lg overflow-hidden hover-lift cursor-pointer">
+    <article className="group relative bg-white border border-editorial rounded-lg overflow-hidden hover-lift">
       {/* Rank Badge - Top Left */}
       <div className="absolute top-4 left-4 z-10">
         <span className={`
@@ -26,32 +31,43 @@ export default function MVPCard({ mvp, rank }: MVPCardProps) {
         </span>
       </div>
 
-      {/* Image Area */}
-      <div className="relative h-52 bg-gradient-to-br from-primary/5 via-accent-sport/5 to-accent-mvp/10 flex items-center justify-center overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-accent-mvp/20 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-sport/20 rounded-full blur-2xl" />
+      {/* Image Area - Link to player */}
+      <Link href={`/player/${playerSlug}`} className="block">
+        <div className="relative h-52 bg-gradient-to-br from-primary/5 via-accent-sport/5 to-accent-mvp/10 flex items-center justify-center overflow-hidden cursor-pointer">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-accent-mvp/20 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-sport/20 rounded-full blur-2xl" />
+          </div>
+          
+          {/* Avatar */}
+          <span className="relative text-7xl transition-transform duration-500 group-hover:scale-110">
+            {mvp.image}
+          </span>
+          
+          {/* MVP Badge - Bottom Right */}
+          <div className="absolute bottom-3 right-3">
+            <BadgeMVP rating={mvp.rating} size="sm" />
+          </div>
         </div>
-        
-        {/* Avatar */}
-        <span className="relative text-7xl transition-transform duration-500 group-hover:scale-110">
-          {mvp.image}
-        </span>
-        
-        {/* MVP Badge - Bottom Right */}
-        <div className="absolute bottom-3 right-3">
-          <BadgeMVP rating={mvp.rating} size="sm" />
-        </div>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-5">
         <div className="mb-3">
-          <h3 className="font-editorial text-xl font-bold text-primary group-hover:text-accent-sport transition-colors">
-            {mvp.name}
-          </h3>
-          <p className="text-sm text-muted mt-1">{mvp.team}</p>
+          {/* Player name - clickable */}
+          <Link href={`/player/${playerSlug}`}>
+            <h3 className="font-editorial text-xl font-bold text-primary hover:text-accent-sport transition-colors cursor-pointer">
+              {mvp.name}
+            </h3>
+          </Link>
+          
+          {/* Team name - clickable */}
+          <Link href={`/team/${teamSlug}`}>
+            <p className="text-sm text-muted mt-1 hover:text-accent-sport transition-colors cursor-pointer">
+              {mvp.team}
+            </p>
+          </Link>
         </div>
 
         <p className="text-xs text-accent-sport font-semibold uppercase tracking-widest mb-4">

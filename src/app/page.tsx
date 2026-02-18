@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
 import HeroMatch from '@/components/HeroMatch'
 import MatchCard from '@/components/MatchCard'
 import MVPCard from '@/components/MVPCard'
@@ -6,91 +8,38 @@ import StatsSection from '@/components/StatsSection'
 import { PrimaryButton, SecondaryButton, TagLigue } from '@/components/ui'
 import type { Match, MVP, Analysis } from '@/types'
 
-// Mock Data - Match du jour
-const featuredMatch: Match = {
-  id: '1',
-  homeTeam: {
-    name: 'Paris Saint-Germain',
-    shortName: 'PSG',
-    logo: '🔵',
-  },
-  awayTeam: {
-    name: 'Olympique de Marseille',
-    shortName: 'OM',
-    logo: '⚪',
-  },
-  homeScore: 2,
-  awayScore: 1,
-  date: '13 Janvier 2026',
-  time: '21:00',
-  competition: 'Ligue 1 • Journée 18',
-  venue: 'Parc des Princes, Paris',
-  isLive: true,
-  status: 'live',
+// Transform Supabase match to homepage Match format
+function transformToHomeMatch(match: any): Match {
+  const matchDate = new Date(`${match.date}T${match.time || '00:00'}`)
+  const formattedDate = matchDate.toLocaleDateString('fr-FR', { 
+    day: 'numeric', 
+    month: 'short' 
+  })
+
+  return {
+    id: match.id,
+    homeTeam: { 
+      name: match.team1, 
+      shortName: match.team1.substring(0, 3).toUpperCase(), 
+      logo: '⚽' 
+    },
+    awayTeam: { 
+      name: match.team2, 
+      shortName: match.team2.substring(0, 3).toUpperCase(), 
+      logo: '⚽' 
+    },
+    homeScore: match.score1 || 0,
+    awayScore: match.score2 || 0,
+    date: formattedDate,
+    time: match.time?.substring(0, 5) || '00:00',
+    competition: match.league,
+    venue: match.stadium || '',
+    isLive: match.status === 'live',
+    status: match.status as 'live' | 'upcoming' | 'finished',
+  }
 }
 
-// Mock Data - Matches à venir
-const upcomingMatches: Match[] = [
-  {
-    id: '2',
-    homeTeam: { name: 'FC Barcelona', shortName: 'FCB', logo: '🔴' },
-    awayTeam: { name: 'Real Madrid', shortName: 'RMA', logo: '⚪' },
-    date: '15 Jan',
-    time: '21:00',
-    competition: 'La Liga',
-    venue: 'Camp Nou',
-    isLive: false,
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    homeTeam: { name: 'Manchester City', shortName: 'MCI', logo: '🩵' },
-    awayTeam: { name: 'Liverpool FC', shortName: 'LIV', logo: '🔴' },
-    date: '16 Jan',
-    time: '18:30',
-    competition: 'Premier League',
-    venue: 'Etihad Stadium',
-    isLive: false,
-    status: 'upcoming',
-  },
-  {
-    id: '4',
-    homeTeam: { name: 'Juventus', shortName: 'JUV', logo: '⚫' },
-    awayTeam: { name: 'AC Milan', shortName: 'ACM', logo: '🔴' },
-    date: '17 Jan',
-    time: '20:45',
-    competition: 'Serie A',
-    venue: 'Allianz Stadium',
-    isLive: false,
-    status: 'upcoming',
-  },
-  {
-    id: '5',
-    homeTeam: { name: 'Bayern Munich', shortName: 'BAY', logo: '🔴' },
-    awayTeam: { name: 'Borussia Dortmund', shortName: 'BVB', logo: '🟡' },
-    homeScore: 3,
-    awayScore: 2,
-    date: '12 Jan',
-    time: '18:30',
-    competition: 'Bundesliga',
-    venue: 'Allianz Arena',
-    isLive: false,
-    status: 'finished',
-  },
-  {
-    id: '6',
-    homeTeam: { name: 'OL Lyon', shortName: 'OL', logo: '🔵' },
-    awayTeam: { name: 'AS Monaco', shortName: 'ASM', logo: '🔴' },
-    date: '18 Jan',
-    time: '17:00',
-    competition: 'Ligue 1',
-    venue: 'Groupama Stadium',
-    isLive: false,
-    status: 'upcoming',
-  },
-]
-
-// Mock Data - Top MVP
+// Mock Data - Top MVP (sera connecté plus tard)
 const topMVPs: MVP[] = [
   {
     id: '1',
@@ -130,7 +79,7 @@ const topMVPs: MVP[] = [
   },
 ]
 
-// Mock Data - Analyses experts
+// Mock Data - Analyses experts (sera connecté plus tard)
 const expertAnalyses: Analysis[] = [
   {
     id: '1',
@@ -179,14 +128,62 @@ const expertAnalyses: Analysis[] = [
   },
 ]
 
-// Leagues for filter tags
-const leagues = ['Ligue 1', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga']
+export const revalidate = 60 // Revalidate every 60 seconds
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient()
+
+  // Fetch live match for hero (or most recent)
+  const { data: liveMatches } = await supabase
+    .from('matches')
+    .select('*')
+    .eq('status', 'live')
+    .limit(1)
+
+  // Fetch upcoming matches
+  const { data: upcomingMatchesData } = await supabase
+    .from('matches')
+    .select('*')
+    .in('status', ['upcoming', 'live'])
+    .order('date', { ascending: true })
+    .order('time', { ascending: true })
+    .limit(6)
+
+  // Fetch competitions for tags
+  const { data: competitions } = await supabase
+    .from('competitions')
+    .select('name')
+    .limit(5)
+
+  // Transform data
+  const heroMatch = liveMatches?.[0] 
+    ? transformToHomeMatch(liveMatches[0])
+    : upcomingMatchesData?.[0] 
+      ? transformToHomeMatch(upcomingMatchesData[0])
+      : null
+
+  const upcomingMatches = upcomingMatchesData?.map(transformToHomeMatch) || []
+  const leagues = competitions?.map(c => c.name) || ['Ligue 1', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga']
+
+  // Fallback hero match if no data
+  const displayHeroMatch = heroMatch || {
+    id: 'placeholder',
+    homeTeam: { name: 'Équipe A', shortName: 'EQA', logo: '⚽' },
+    awayTeam: { name: 'Équipe B', shortName: 'EQB', logo: '⚽' },
+    homeScore: 0,
+    awayScore: 0,
+    date: 'Bientôt',
+    time: '--:--',
+    competition: 'Synchronisation en cours...',
+    venue: '',
+    isLive: false,
+    status: 'upcoming' as const,
+  }
+
   return (
     <div className="min-h-screen bg-secondary">
       {/* Hero - Match du jour (Full Width) */}
-      <HeroMatch match={featuredMatch} />
+      <HeroMatch match={displayHeroMatch} />
 
       {/* League Tags Filter */}
       <section className="bg-white border-b border-editorial">
@@ -213,23 +210,37 @@ export default function Home() {
               Matches à venir
             </h2>
           </div>
-          <SecondaryButton
-            size="sm"
-            rightIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            }
-          >
-            Voir tout
-          </SecondaryButton>
+          <Link href="/matches">
+            <SecondaryButton
+              size="sm"
+              rightIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              }
+            >
+              Voir tout
+            </SecondaryButton>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {upcomingMatches.map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))}
-        </div>
+        {upcomingMatches.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcomingMatches.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white border border-editorial rounded-lg p-12 text-center">
+            <span className="text-5xl mb-4 block">⚽</span>
+            <h3 className="font-editorial text-xl font-bold text-primary mb-2">
+              Matches en cours de synchronisation
+            </h3>
+            <p className="text-muted text-sm">
+              Les données seront disponibles sous peu.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Section: Top MVP */}
@@ -244,16 +255,18 @@ export default function Home() {
                 Top MVP de la semaine
               </h2>
             </div>
-            <SecondaryButton
-              size="sm"
-              rightIcon={
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              }
-            >
-              Classement complet
-            </SecondaryButton>
+            <Link href="/mvp">
+              <SecondaryButton
+                size="sm"
+                rightIcon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                }
+              >
+                Classement complet
+              </SecondaryButton>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -279,16 +292,18 @@ export default function Home() {
                 Analyses d&apos;experts
               </h2>
             </div>
-            <SecondaryButton
-              size="sm"
-              rightIcon={
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              }
-            >
-              Toutes les analyses
-            </SecondaryButton>
+            <Link href="/experts">
+              <SecondaryButton
+                size="sm"
+                rightIcon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                }
+              >
+                Toutes les analyses
+              </SecondaryButton>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -318,12 +333,16 @@ export default function Home() {
             Partagez votre passion, débattez avec d&apos;autres fans et accédez à du contenu exclusif.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <PrimaryButton size="lg">
-              Créer un compte
-            </PrimaryButton>
-            <SecondaryButton size="lg" className="border-white/30 text-white hover:bg-white/10">
-              En savoir plus
-            </SecondaryButton>
+            <Link href="/signup">
+              <PrimaryButton size="lg">
+                Créer un compte
+              </PrimaryButton>
+            </Link>
+            <Link href="/community">
+              <SecondaryButton size="lg" className="border-white/30 text-white hover:bg-white/10">
+                Découvrir la communauté
+              </SecondaryButton>
+            </Link>
           </div>
         </div>
       </section>

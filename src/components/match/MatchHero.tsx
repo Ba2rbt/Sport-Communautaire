@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import { BadgeLive, TagLigue } from '@/components/ui'
+import { getTeamSlug } from '@/lib/utils'
 
 interface Team {
   name: string
@@ -37,6 +39,9 @@ export default function MatchHero({
   const isFinished = status === 'finished'
   const isUpcoming = status === 'upcoming'
 
+  const homeSlug = getTeamSlug(homeTeam.name)
+  const awaySlug = getTeamSlug(awayTeam.name)
+
   return (
     <section className="relative w-full overflow-hidden bg-primary text-white">
       {/* Background */}
@@ -71,23 +76,26 @@ export default function MatchHero({
 
         {/* Match Display */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-0">
-          {/* Home Team */}
-          <div className="flex-1 flex flex-col items-center lg:items-end text-center lg:text-right">
+          {/* Home Team - Clickable */}
+          <Link 
+            href={`/team/${homeSlug}`}
+            className="flex-1 flex flex-col items-center lg:items-end text-center lg:text-right group/home"
+          >
             <div className="relative mb-4">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl group-hover/home:scale-105 group-hover/home:border-accent-sport/50 transition-all duration-300">
                 {homeTeam.logo}
               </div>
               {isLive && (
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-accent-live rounded-full animate-pulse-live" />
               )}
             </div>
-            <h2 className="font-editorial text-2xl md:text-3xl font-bold mb-1">
+            <h2 className="font-editorial text-2xl md:text-3xl font-bold mb-1 group-hover/home:text-accent-sport transition-colors">
               {homeTeam.name}
             </h2>
             <span className="text-white/60 text-sm tracking-widest uppercase">
               {homeTeam.shortName} • Domicile
             </span>
-          </div>
+          </Link>
 
           {/* Score */}
           <div className="flex flex-col items-center py-6 lg:py-0 lg:px-12 lg:min-w-[280px]">
@@ -130,20 +138,23 @@ export default function MatchHero({
             )}
           </div>
 
-          {/* Away Team */}
-          <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+          {/* Away Team - Clickable */}
+          <Link 
+            href={`/team/${awaySlug}`}
+            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left group/away"
+          >
             <div className="relative mb-4">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl group-hover/away:scale-105 group-hover/away:border-accent-live/50 transition-all duration-300">
                 {awayTeam.logo}
               </div>
             </div>
-            <h2 className="font-editorial text-2xl md:text-3xl font-bold mb-1">
+            <h2 className="font-editorial text-2xl md:text-3xl font-bold mb-1 group-hover/away:text-accent-live transition-colors">
               {awayTeam.name}
             </h2>
             <span className="text-white/60 text-sm tracking-widest uppercase">
               {awayTeam.shortName} • Extérieur
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* Byline Meta */}

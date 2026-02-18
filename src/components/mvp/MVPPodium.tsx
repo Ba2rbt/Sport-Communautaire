@@ -1,7 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import type { MVPRanking } from '@/types/mvp'
 import { positionLabels } from '@/types/mvp'
+import { getPlayerSlug, getTeamSlug } from '@/lib/utils'
 
 interface MVPPodiumProps {
   topThree: MVPRanking[]
@@ -35,6 +37,9 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
     3: 'bg-gradient-to-t from-amber-700 to-amber-500',
   }
 
+  const playerSlug = getPlayerSlug(player.playerName)
+  const teamSlug = getTeamSlug(player.teamName)
+
   return (
     <div className={`flex flex-col items-center ${isCenter ? 'order-2' : player.rank === 2 ? 'order-1' : 'order-3'}`}>
       {/* Trophy Badge */}
@@ -42,9 +47,12 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
         <TrophyIcon rank={player.rank} />
       </div>
 
-      {/* Player Photo */}
-      <div className={`relative mb-4 ${isCenter ? 'w-32 h-32' : 'w-24 h-24'}`}>
-        <div className={`absolute inset-0 rounded-full ${podiumColors[player.rank as keyof typeof podiumColors]} opacity-30 blur-xl`} />
+      {/* Player Photo - Clickable */}
+      <Link 
+        href={`/player/${playerSlug}`}
+        className={`relative mb-4 ${isCenter ? 'w-32 h-32' : 'w-24 h-24'} group/photo`}
+      >
+        <div className={`absolute inset-0 rounded-full ${podiumColors[player.rank as keyof typeof podiumColors]} opacity-30 blur-xl group-hover/photo:opacity-50 transition-opacity`} />
         {player.photoUrl ? (
           <img 
             src={player.photoUrl} 
@@ -52,13 +60,13 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
             className={`relative w-full h-full rounded-full object-cover border-4 ${
               player.rank === 1 ? 'border-yellow-400' : 
               player.rank === 2 ? 'border-gray-300' : 'border-amber-600'
-            } shadow-xl`}
+            } shadow-xl group-hover/photo:scale-105 transition-transform`}
           />
         ) : (
           <div className={`relative w-full h-full rounded-full bg-gradient-to-br from-primary to-accent-mvp flex items-center justify-center border-4 ${
             player.rank === 1 ? 'border-yellow-400' : 
             player.rank === 2 ? 'border-gray-300' : 'border-amber-600'
-          } shadow-xl`}>
+          } shadow-xl group-hover/photo:scale-105 transition-transform`}>
             <span className={`font-bold text-white ${isCenter ? 'text-3xl' : 'text-xl'}`}>
               {player.jerseyNumber || player.playerName[0]}
             </span>
@@ -72,14 +80,24 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
         }`}>
           {player.rank}
         </div>
-      </div>
+      </Link>
 
       {/* Player Info */}
       <div className="text-center mb-4">
-        <h3 className={`font-editorial font-bold text-primary ${isCenter ? 'text-2xl' : 'text-lg'}`}>
-          {player.playerName}
-        </h3>
-        <p className="text-muted text-sm">{player.teamName}</p>
+        {/* Player Name - Clickable */}
+        <Link href={`/player/${playerSlug}`}>
+          <h3 className={`font-editorial font-bold text-primary hover:text-accent-sport transition-colors ${isCenter ? 'text-2xl' : 'text-lg'}`}>
+            {player.playerName}
+          </h3>
+        </Link>
+        
+        {/* Team Name - Clickable */}
+        <Link href={`/team/${teamSlug}`}>
+          <p className="text-muted text-sm hover:text-accent-sport transition-colors">
+            {player.teamName}
+          </p>
+        </Link>
+        
         <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-semibold rounded-full ${position?.color || 'bg-muted text-white'}`}>
           {position?.label || player.position}
         </span>

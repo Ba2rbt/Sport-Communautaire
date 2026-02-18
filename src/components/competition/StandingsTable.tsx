@@ -1,6 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import type { Standing, FormResult } from '@/types/competition'
+import { getTeamSlug } from '@/lib/utils'
 
 interface StandingsTableProps {
   standings: Standing[]
@@ -116,69 +118,76 @@ export default function StandingsTable({ standings, highlightPositions }: Standi
             </tr>
           </thead>
           <tbody className="divide-y divide-editorial">
-            {standings.map((row) => (
-              <tr 
-                key={row.id} 
-                className="hover:bg-secondary/30 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <PositionBadge 
-                    position={row.position} 
-                    highlights={highlightPositions}
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 flex items-center justify-center text-xl">
-                      {row.team.logo}
+            {standings.map((row) => {
+              const teamSlug = getTeamSlug(row.team.name)
+              
+              return (
+                <tr 
+                  key={row.id} 
+                  className="hover:bg-secondary/30 transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <PositionBadge 
+                      position={row.position} 
+                      highlights={highlightPositions}
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link 
+                      href={`/team/${teamSlug}`}
+                      className="flex items-center gap-3 group/team"
+                    >
+                      <span className="w-8 h-8 flex items-center justify-center text-xl group-hover/team:scale-110 transition-transform">
+                        {row.team.logo}
+                      </span>
+                      <div>
+                        <span className="font-semibold text-primary block group-hover/team:text-accent-sport transition-colors">
+                          {row.team.name}
+                        </span>
+                        <span className="text-xs text-muted sm:hidden">
+                          {row.won}V {row.drawn}N {row.lost}D
+                        </span>
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary font-medium">
+                    {row.played}
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
+                    {row.won}
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
+                    {row.drawn}
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
+                    {row.lost}
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary hidden md:table-cell">
+                    {row.goalsFor}
+                  </td>
+                  <td className="px-4 py-3 text-center text-primary hidden md:table-cell">
+                    {row.goalsAgainst}
+                  </td>
+                  <td className="px-4 py-3 text-center font-semibold hidden lg:table-cell">
+                    <span className={row.goalDifference > 0 ? 'text-accent-live' : row.goalDifference < 0 ? 'text-red-500' : 'text-muted'}>
+                      {row.goalDifference > 0 ? '+' : ''}{row.goalDifference}
                     </span>
-                    <div>
-                      <span className="font-semibold text-primary block">
-                        {row.team.name}
-                      </span>
-                      <span className="text-xs text-muted sm:hidden">
-                        {row.won}V {row.drawn}N {row.lost}D
-                      </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="font-bold text-lg text-primary">
+                      {row.points}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 hidden sm:table-cell">
+                    <div className="flex items-center justify-center gap-1">
+                      {row.form.slice(0, 5).map((result, i) => (
+                        <FormBadge key={i} result={result} />
+                      ))}
                     </div>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-center text-primary font-medium">
-                  {row.played}
-                </td>
-                <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
-                  {row.won}
-                </td>
-                <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
-                  {row.drawn}
-                </td>
-                <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
-                  {row.lost}
-                </td>
-                <td className="px-4 py-3 text-center text-primary hidden md:table-cell">
-                  {row.goalsFor}
-                </td>
-                <td className="px-4 py-3 text-center text-primary hidden md:table-cell">
-                  {row.goalsAgainst}
-                </td>
-                <td className="px-4 py-3 text-center font-semibold hidden lg:table-cell">
-                  <span className={row.goalDifference > 0 ? 'text-accent-live' : row.goalDifference < 0 ? 'text-red-500' : 'text-muted'}>
-                    {row.goalDifference > 0 ? '+' : ''}{row.goalDifference}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <span className="font-bold text-lg text-primary">
-                    {row.points}
-                  </span>
-                </td>
-                <td className="px-4 py-3 hidden sm:table-cell">
-                  <div className="flex items-center justify-center gap-1">
-                    {row.form.slice(0, 5).map((result, i) => (
-                      <FormBadge key={i} result={result} />
-                    ))}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
