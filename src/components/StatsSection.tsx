@@ -9,6 +9,8 @@ const topScorers = [
     name: 'Erling Haaland',
     team: 'Manchester City',
     avatar: '🎯',
+    imageUrl:
+      'https://images.unsplash.com/photo-1508344928928-7165b67de128?q=80&w=150&auto=format&fit=crop', // Placeholder
     goals: 22,
     assists: 5,
     matches: 18,
@@ -18,6 +20,8 @@ const topScorers = [
     name: 'Kylian Mbappé',
     team: 'Real Madrid',
     avatar: '⚡',
+    imageUrl:
+      'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=150&auto=format&fit=crop', // Placeholder
     goals: 18,
     assists: 8,
     matches: 17,
@@ -27,6 +31,8 @@ const topScorers = [
     name: 'Harry Kane',
     team: 'Bayern Munich',
     avatar: '🦁',
+    imageUrl:
+      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=150&auto=format&fit=crop', // Placeholder
     goals: 17,
     assists: 7,
     matches: 18,
@@ -80,7 +86,12 @@ export default function StatsSection() {
                   key: 'name',
                   header: 'Joueur',
                   render: (item) => (
-                    <PlayerCell name={item.name} team={item.team} avatar={item.avatar} />
+                    <PlayerCell
+                      name={item.name}
+                      team={item.team}
+                      avatar={item.avatar}
+                      imageUrl={item.imageUrl}
+                    />
                   ),
                 },
                 {

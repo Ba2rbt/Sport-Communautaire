@@ -2,6 +2,8 @@
 
 import { type ReactNode } from 'react'
 
+import Image from 'next/image'
+
 interface Column<T> {
   key: keyof T | string
   header: string
@@ -153,15 +155,21 @@ export function PlayerCell({
   name,
   team,
   avatar,
+  imageUrl,
 }: {
   name: string
   team: string
   avatar?: string
+  imageUrl?: string
 }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-xl flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform duration-300">
-        {avatar || name.charAt(0)}
+      <div className="relative w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-xl flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+        {imageUrl ? (
+          <Image src={imageUrl} alt={name} fill className="object-cover" sizes="48px" />
+        ) : (
+          avatar || name.charAt(0)
+        )}
       </div>
       <div>
         <p className="font-bold text-white text-base group-hover:text-accent-glow transition-colors">
