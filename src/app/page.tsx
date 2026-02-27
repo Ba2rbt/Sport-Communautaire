@@ -163,7 +163,7 @@ export default async function Home() {
       : null
 
   const upcomingMatches = upcomingMatchesData?.map(transformToHomeMatch) || []
-  const leagues = competitions?.map(c => c.name) || ['Ligue 1', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga']
+  const leagues = competitions?.map((c: any) => c.name) || ['Ligue 1', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga']
 
   // Fallback hero match if no data
   const displayHeroMatch = heroMatch || {
@@ -185,41 +185,51 @@ export default async function Home() {
       {/* Hero - Match du jour (Full Width) */}
       <HeroMatch match={displayHeroMatch} />
 
-      {/* League Tags Filter */}
-      <section className="bg-white border-b border-editorial">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            <span className="text-xs font-semibold text-muted uppercase tracking-wider whitespace-nowrap">
-              Compétitions :
+      {/* League Tags Filter - Sticky Glass Bar */}
+      <section className="sticky top-[80px] z-40 py-4 glass border-y border-white/5 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide mask-fade-right">
+            <span className="text-xs font-bold text-accent-sport uppercase tracking-widest whitespace-nowrap px-2">
+              Compétitions
             </span>
+            <div className="h-6 w-px bg-white/10 mx-2" />
             {leagues.map((league, index) => (
-              <TagLigue key={league} league={league} isActive={index === 0} />
+              <TagLigue 
+                key={league} 
+                league={league} 
+                isActive={index === 0} 
+                className="hover:scale-105 transition-transform"
+              />
             ))}
           </div>
         </div>
       </section>
 
       {/* Section: Matches à venir */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex items-end justify-between mb-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20">
+        <div className="flex items-end justify-between mb-10 animate-fade-in">
           <div>
-            <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
-              Calendrier
-            </span>
-            <h2 className="font-editorial text-3xl md:text-4xl font-bold text-primary">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-sport" />
+              <span className="text-xs font-bold tracking-widest uppercase text-slate-400">
+                Calendrier
+              </span>
+            </div>
+            <h2 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight">
               Matches à venir
             </h2>
           </div>
           <Link href="/matches">
             <SecondaryButton
               size="sm"
+              className="hidden sm:flex"
               rightIcon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               }
             >
-              Voir tout
+              TOUT VOIR
             </SecondaryButton>
           </Link>
         </div>
@@ -231,12 +241,14 @@ export default async function Home() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-editorial rounded-lg p-12 text-center">
-            <span className="text-5xl mb-4 block">⚽</span>
-            <h3 className="font-editorial text-xl font-bold text-primary mb-2">
+          <div className="glass rounded-2xl p-12 text-center border border-white/5 bg-gradient-to-b from-white/[0.05] to-transparent">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center text-4xl shadow-inner border border-white/5">
+              ⚽
+            </div>
+            <h3 className="font-sans text-xl font-bold text-white mb-2">
               Matches en cours de synchronisation
             </h3>
-            <p className="text-muted text-sm">
+            <p className="text-slate-400 text-sm">
               Les données seront disponibles sous peu.
             </p>
           </div>
@@ -244,27 +256,35 @@ export default async function Home() {
       </section>
 
       {/* Section: Top MVP */}
-      <section className="bg-gradient-to-b from-secondary via-white to-white">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="flex items-end justify-between mb-10">
+      <section className="relative py-20 overflow-hidden">
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-mvp/5 to-transparent pointer-events-none" />
+        <div className="absolute -left-40 top-1/4 w-80 h-80 bg-accent-mvp/10 rounded-full blur-[100px]" />
+        
+        <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+          <div className="flex items-end justify-between mb-12">
             <div>
-              <span className="text-xs font-semibold tracking-widest uppercase text-accent-mvp mb-2 block">
-                Performances
-              </span>
-              <h2 className="font-editorial text-3xl md:text-4xl font-bold text-primary">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-mvp" />
+                <span className="text-xs font-bold tracking-widest uppercase text-accent-mvp">
+                  Performances
+                </span>
+              </div>
+              <h2 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight">
                 Top MVP de la semaine
               </h2>
             </div>
             <Link href="/mvp">
               <SecondaryButton
                 size="sm"
+                className="hidden sm:flex"
                 rightIcon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 }
               >
-                Classement complet
+                CLASSEMENT
               </SecondaryButton>
             </Link>
           </div>
@@ -281,67 +301,97 @@ export default async function Home() {
       <StatsSection />
 
       {/* Section: Analyses experts */}
-      <section className="bg-secondary">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="flex items-end justify-between mb-10">
+      <section className="relative py-24 bg-[#020617]/50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex items-end justify-between mb-12">
             <div>
-              <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-2 block">
-                Édito
-              </span>
-              <h2 className="font-editorial text-3xl md:text-4xl font-bold text-primary">
-                Analyses d&apos;experts
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 text-blue-500 shadow-[0_0_10px_currentColor]" />
+                <span className="text-xs font-bold tracking-widest uppercase text-blue-500">
+                  Édito & Analyses
+                </span>
+              </div>
+              <h2 className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight">
+                Le coin des experts
               </h2>
             </div>
             <Link href="/experts">
               <SecondaryButton
                 size="sm"
+                className="hidden sm:flex"
                 rightIcon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 }
               >
-                Toutes les analyses
+                TOUS LES ARTICLES
               </SecondaryButton>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {expertAnalyses.map((analysis) => (
               <ExpertCard key={analysis.id} analysis={analysis} />
             ))}
+            
+            {/* Carte "Devenir Expert" */}
+            <Link href="/experts/create" className="group relative overflow-hidden rounded-2xl glass border border-white/5 p-8 flex flex-col justify-center items-center text-center transition-all duration-500 hover:border-accent-sport/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-sport/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="w-16 h-16 rounded-full bg-accent-sport/10 flex items-center justify-center mb-6 group-hover:bg-accent-sport/20 transition-colors duration-300">
+                <svg className="w-8 h-8 text-accent-sport" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-accent-sport transition-colors">
+                Devenir Expert
+              </h3>
+              <p className="text-slate-400 text-sm mb-6 max-w-xs">
+                Partagez vos analyses tactiques et rejoignez la communauté des experts vérifiés.
+              </p>
+              
+              <span className="inline-flex items-center text-accent-sport text-sm font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                Postuler
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+            </Link>
           </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative bg-primary text-secondary overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-accent-sport/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-live/10 rounded-full blur-3xl" />
+      </section>      {/* CTA Section */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-[#020617]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(59,130,246,0.1),_transparent_70%)]" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-24 text-center">
-          <span className="text-xs font-semibold tracking-widest uppercase text-accent-sport mb-4 block">
-            Rejoignez-nous
+        <div className="relative max-w-7xl mx-auto px-6 text-center z-10">
+          <span className="inline-block py-1 px-3 rounded-full bg-accent-sport/10 text-accent-sport text-xs font-bold uppercase tracking-widest mb-6 border border-accent-sport/20">
+            Communauté
           </span>
-          <h2 className="font-editorial text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Rejoignez la communauté
+          <h2 className="font-sans text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+            Vivez le football <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-sport to-accent-live">autrement</span>
           </h2>
-          <p className="text-muted text-lg max-w-2xl mx-auto mb-10">
-            Partagez votre passion, débattez avec d&apos;autres fans et accédez à du contenu exclusif.
+          <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+            Rejoignez des milliers de passionnés, participez aux débats en direct et analysez les performances comme jamais auparavant.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
-              <PrimaryButton size="lg">
-                Créer un compte
-              </PrimaryButton>
-            </Link>
-            <Link href="/community">
-              <SecondaryButton size="lg" className="border-white/30 text-white hover:bg-white/10">
-                Découvrir la communauté
-              </SecondaryButton>
+              <div className="group relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-accent-sport to-accent-live rounded-full blur opacity-60 group-hover:opacity-100 transition duration-200"></div>
+                <button className="relative px-8 py-4 bg-black rounded-full leading-none flex items-center divide-x divide-slate-600">
+                  <span className="flex items-center space-x-5">
+                    <span className="pr-6 text-white font-bold tracking-wider">CRÉER UN COMPTE</span>
+                  </span>
+                  <span className="pl-6 text-accent-sport group-hover:text-white transition duration-200">
+                    &rarr;
+                  </span>
+                </button>
+              </div>
             </Link>
           </div>
         </div>

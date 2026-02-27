@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useActionState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -7,139 +8,106 @@ import { login, type AuthState } from '../actions'
 
 const initialState: AuthState = {}
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirectTo')
   const [state, formAction, isPending] = useActionState(login, initialState)
 
   return (
-    <div className="min-h-screen bg-secondary flex flex-col">
-      {/* Header */}
-      <header className="border-b border-editorial bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <Link href="/" className="font-editorial text-2xl font-bold text-primary">
-            SportUnion
+    <div className="glass bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl backdrop-blur-md">
+      <form action={formAction} className="space-y-6">
+        {redirectTo && (
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+        )}
+
+        {state.error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <p className="text-sm text-red-500 text-center">{state.error}</p>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-300">Email</label>
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="nom@exemple.com"
+            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-accent-sport focus:ring-1 focus:ring-accent-sport text-white placeholder:text-slate-600 transition-colors"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-300">Mot de passe</label>
+            <a href="#" className="text-xs text-accent-sport hover:text-white transition-colors">
+              Oublié ?
+            </a>
+          </div>
+          <input
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••"
+            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-accent-sport focus:ring-1 focus:ring-accent-sport text-white placeholder:text-slate-600 transition-colors"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full py-3 bg-white text-black font-bold rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? 'Connexion...' : 'Se connecter'}
+        </button>
+      </form>
+
+      <div className="mt-8 pt-8 border-t border-white/5 text-center">
+        <p className="text-sm text-slate-400">
+          Pas encore de compte ?{' '}
+          <Link
+            href="/signup"
+            className="text-accent-sport font-bold hover:text-white transition-colors"
+          >
+            Créer un compte
           </Link>
-        </div>
-      </header>
+        </p>
+      </div>
+    </div>
+  )
+}
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md">
-          {/* Title */}
-          <div className="text-center mb-10">
-            <h1 className="font-editorial text-4xl font-bold text-primary mb-3">
-              Connexion
-            </h1>
-            <p className="text-muted">
-              Accédez à votre compte SportUnion
-            </p>
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen bg-[#020617] flex flex-col justify-center relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="w-full max-w-md mx-auto px-6 relative z-10">
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-accent-sport rounded-full mx-auto flex items-center justify-center mb-4">
+            <span className="font-bold text-black text-xl">S</span>
           </div>
-
-          {/* Form Card */}
-          <div className="bg-white border border-editorial rounded-lg p-8">
-            <form action={formAction} className="space-y-6">
-              {/* Hidden redirect field */}
-              {redirectTo && (
-                <input type="hidden" name="redirectTo" value={redirectTo} />
-              )}
-
-              {/* Error Message */}
-              {state.error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{state.error}</p>
-                </div>
-              )}
-
-              {/* Email Field */}
-              <div>
-                <label 
-                  htmlFor="email" 
-                  className="block text-sm font-medium text-primary mb-2"
-                >
-                  Adresse email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  className="w-full px-4 py-3 border border-editorial rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-sport focus:border-transparent transition-all text-primary placeholder:text-muted/50"
-                  placeholder="vous@exemple.com"
-                />
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label 
-                  htmlFor="password" 
-                  className="block text-sm font-medium text-primary mb-2"
-                >
-                  Mot de passe
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  className="w-full px-4 py-3 border border-editorial rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-sport focus:border-transparent transition-all text-primary placeholder:text-muted/50"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isPending}
-                className="w-full py-4 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-semibold rounded-lg transition-colors"
-              >
-                {isPending ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Connexion...
-                  </span>
-                ) : (
-                  'Se connecter'
-                )}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-editorial" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-muted">ou</span>
-              </div>
-            </div>
-
-            {/* Signup Link */}
-            <p className="text-center text-muted">
-              Pas encore de compte ?{' '}
-              <Link 
-                href="/signup" 
-                className="text-accent-sport hover:text-accent-sport/80 font-medium transition-colors"
-              >
-                Créer un compte
-              </Link>
-            </p>
-          </div>
-
-          {/* Footer Text */}
-          <p className="text-center text-xs text-muted mt-8">
-            En vous connectant, vous acceptez nos{' '}
-            <a href="#" className="underline hover:text-primary">conditions d&apos;utilisation</a>
-            {' '}et notre{' '}
-            <a href="#" className="underline hover:text-primary">politique de confidentialité</a>.
-          </p>
+          <h1 className="text-3xl font-bold text-white mb-2">Bon retour</h1>
+          <p className="text-slate-400">Connectez-vous pour accéder à votre espace.</p>
         </div>
-      </main>
+
+        {/* Suspense requis par Next.js pour useSearchParams() */}
+        <Suspense
+          fallback={
+            <div className="glass bg-white/5 border border-white/10 rounded-2xl p-8 h-64 animate-pulse" />
+          }
+        >
+          <LoginForm />
+        </Suspense>
+
+        <p className="mt-8 text-center text-xs text-slate-500">
+          © 2026 SportUnion. Tous droits réservés.
+        </p>
+      </div>
     </div>
   )
 }

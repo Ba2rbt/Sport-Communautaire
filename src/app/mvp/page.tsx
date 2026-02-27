@@ -15,85 +15,75 @@ export const metadata = {
 
 export default function MVPIndexPage() {
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <header className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-mvp/10 rounded-full mb-4">
-          <span className="text-xl">🏆</span>
-          <span className="text-accent-mvp font-semibold text-sm uppercase tracking-wider">Classement Saison</span>
-        </div>
-        <h1 className="font-editorial text-5xl md:text-7xl font-black text-primary mb-4">
-          MVP Saison
-        </h1>
-        <p className="text-muted text-lg max-w-xl mx-auto">
-          Découvrez et votez pour les meilleurs joueurs de chaque compétition européenne.
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#0f0720] text-white overflow-hidden selection:bg-orange-500/30">
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[20%] left-[30%] w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[120px] animate-pulse-slow" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[100px]" />
+      </div>
 
-      {/* Competitions Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-        {competitions.map((comp) => (
-          <Link
-            key={comp.id}
-            href={`/mvp/${comp.id}`}
-            className="group relative overflow-hidden bg-white border border-editorial rounded-xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            {/* Background gradient on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-mvp/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="relative">
-              {/* Logo & Name */}
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-5xl">{comp.logo}</span>
-                <div>
-                  <h2 className="font-editorial text-2xl font-bold text-primary group-hover:text-accent-mvp transition-colors">
-                    {comp.name}
-                  </h2>
-                  <p className="text-muted text-sm">{comp.country}</p>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="flex items-center justify-between pt-4 border-t border-editorial">
-                <div>
-                  <p className="text-xs text-muted uppercase tracking-wider">Saison</p>
-                  <p className="font-semibold text-primary">{comp.season}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted uppercase tracking-wider">Votes</p>
-                  <p className="font-bold text-accent-mvp">{comp.totalVotes.toLocaleString()}</p>
-                </div>
-              </div>
-
-              {/* Arrow */}
-              <div className="absolute top-4 right-4 w-8 h-8 bg-secondary rounded-full flex items-center justify-center group-hover:bg-accent-mvp group-hover:text-white transition-colors">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+      <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
+        
+        {/* Hero Header */}
+        <div className="text-center mb-24">
+            <div className="inline-flex items-center gap-3 px-4 py-2 border border-orange-500/30 rounded-full bg-orange-500/5 backdrop-blur-md mb-8">
+               <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+               <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Saison 2025/2026</span>
             </div>
-          </Link>
-        ))}
-      </section>
+            
+            <h1 className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-600 mb-8 drop-shadow-2xl">
+                Hall of MVP
+            </h1>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto border-t border-white/5 pt-8">
+                C'est vous qui décidez. Le pouvoir est entre vos mains pour élire les légendes de demain.
+            </p>
+        </div>
 
-      {/* CTA */}
-      <section className="bg-gradient-to-r from-accent-mvp to-orange-600 text-white rounded-2xl p-8 md:p-12 text-center">
-        <h2 className="font-editorial text-3xl font-bold mb-4">
-          Votre voix compte !
-        </h2>
-        <p className="text-white/80 mb-6 max-w-xl mx-auto">
-          Après chaque match, votez pour le joueur qui mérite selon vous d'être élu MVP de la saison.
-        </p>
-        <Link
-          href="/matches"
-          className="inline-flex items-center gap-2 px-8 py-3 bg-white text-accent-mvp font-bold rounded-full hover:bg-secondary transition-colors"
-        >
-          Voir les matchs
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </Link>
-      </section>
+        {/* Competition Cards - Expanded Layout */}
+        <div className="space-y-4">
+             {competitions.map((comp, index) => (
+                <Link 
+                    key={comp.id} 
+                    href={`/mvp/${comp.id}`} 
+                    className="group relative block"
+                >
+                    <div className="relative h-32 md:h-40 glass border border-white/5 rounded-2xl flex items-center justify-between px-8 md:px-12 overflow-hidden transition-all duration-500 hover:h-48 hover:border-orange-500/50 hover:bg-[#1a1033]">
+                        {/* Background Hover Effect */}
+                        <div className="absolute inset-0 bg-linear-to-r from-orange-600/20 to-transparent -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+                        
+                        <div className="relative z-10 flex items-center gap-8">
+                            <span className="text-5xl md:text-7xl font-black text-white/5 group-hover:text-white/20 transition-colors">
+                                0{index + 1}
+                            </span>
+                            <div className="text-4xl md:text-5xl grayscale group-hover:grayscale-0 transition-all duration-300 transform group-hover:scale-110">
+                                {comp.logo}
+                            </div>
+                            <div>
+                                <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter text-white group-hover:text-orange-400 transition-colors">
+                                    {comp.name}
+                                </h2>
+                                <p className="text-sm font-mono text-slate-500 group-hover:text-white/60">
+                                    {comp.country} • {comp.totalVotes.toLocaleString()} Votes
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 hidden md:flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-10 group-hover:translate-x-0">
+                            <span className="text-sm font-bold uppercase tracking-widest text-orange-500">
+                                Voir le classement
+                            </span>
+                            <div className="w-12 h-12 rounded-full border border-orange-500 flex items-center justify-center text-orange-500 bg-orange-500/10">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+             ))}
+        </div>
+
+      </div>
     </div>
   )
 }

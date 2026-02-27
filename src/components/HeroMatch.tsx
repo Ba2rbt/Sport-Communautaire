@@ -12,176 +12,104 @@ export default function HeroMatch({ match }: HeroMatchProps) {
   const awayTeamSlug = getTeamSlug(match.awayTeam.name)
 
   return (
-    <section className="relative w-full overflow-hidden bg-primary text-secondary">
-      {/* Full-width Background Pattern */}
+    <section className="relative w-full overflow-hidden text-white min-h-[85vh] flex items-center justify-center">
+      {/* Full-width Immersive Background */}
       <div className="absolute inset-0">
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-accent-sport/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-[#020617] to-black" />
         
-        {/* Animated grid pattern */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-          <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="1" />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#hero-grid)" />
-        </svg>
-
-        {/* Decorative circles with animation */}
-        <div className="absolute -top-24 -right-24 w-64 sm:w-96 h-64 sm:h-96 bg-accent-sport/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-24 -left-24 w-52 sm:w-80 h-52 sm:h-80 bg-accent-live/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        {/* Animated Aurora Effect */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-blue/20 rounded-full blur-[128px] animate-pulse-slow" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[128px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        
+        {/* Grid */}
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
       </div>
 
-      {/* Content Container - Full Width */}
-      <div className="relative w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-24 lg:py-32">
-          {/* Section Label */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-in">
-            <div className="h-px w-8 sm:w-12 bg-gradient-to-r from-transparent to-accent-sport" />
-            <span className="text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-accent-sport">
-              Match du jour
+      {/* Content Container */}
+      <div className="relative w-full max-w-7xl mx-auto px-4 z-10">
+        <div className="flex flex-col items-center">
+          
+          {/* Section Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass border-white/10 mb-8 animate-fade-in-down">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-live animate-pulse" />
+            <span className="text-xs font-bold tracking-widest uppercase text-slate-300">
+              Match à la une
             </span>
-            <div className="h-px w-8 sm:w-12 bg-gradient-to-l from-transparent to-accent-sport" />
-            {match.isLive && <BadgeLive size="md" />}
           </div>
 
-          {/* Competition Info */}
-          <p 
-            className="text-center text-muted text-xs sm:text-sm md:text-base mb-8 sm:mb-10 tracking-wide animate-fade-in px-4"
-            style={{ animationDelay: '100ms' }}
-          >
-            {match.competition} {match.venue && `• ${match.venue}`}
-          </p>
-
-          {/* Match Display - XXL Score */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-0">
-            {/* Home Team - Clickable */}
+          {/* Teams Display */}
+          <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-12">
+            
+            {/* Home Team */}
             <Link 
               href={`/team/${homeTeamSlug}`}
-              className="flex-1 flex flex-col items-center lg:items-end text-center lg:text-right lg:pr-8 xl:pr-12 animate-fade-in group/home"
-              style={{ animationDelay: '200ms' }}
+              className="group flex flex-col items-center lg:items-end text-center lg:text-right"
             >
-              <div className="relative mb-4 sm:mb-6">
-                <div className="
-                  w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 
-                  bg-white/5 backdrop-blur-sm rounded-full 
-                  flex items-center justify-center 
-                  text-3xl sm:text-5xl md:text-6xl lg:text-7xl 
-                  border border-white/10 shadow-2xl
-                  group-hover/home:scale-105 group-hover/home:border-accent-sport/50 transition-all duration-300
-                ">
+              <div className="relative mb-6 transform group-hover:scale-105 transition-transform duration-500">
+                <div className="w-32 h-32 lg:w-40 lg:h-40 glass rounded-full flex items-center justify-center text-6xl shadow-2xl shadow-accent-blue/10 border border-white/5 group-hover:border-accent-blue/30 transition-colors">
                   {match.homeTeam.logo}
                 </div>
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-accent-sport/20 rounded-full blur-xl -z-10 group-hover/home:bg-accent-sport/40 transition-colors" />
+                <div className="absolute inset-0 rounded-full bg-accent-blue/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <h2 className="font-editorial text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 tracking-tight group-hover/home:text-accent-sport transition-colors">
+              <h2 className="text-3xl lg:text-5xl font-black tracking-tighter mb-2 group-hover:text-accent-blue transition-colors">
                 {match.homeTeam.name}
               </h2>
-              <span className="text-muted text-xs sm:text-sm md:text-base tracking-widest uppercase">
-                {match.homeTeam.shortName}
-              </span>
+              <p className="text-slate-400 font-medium tracking-widest uppercase text-sm">HOME</p>
             </Link>
 
-            {/* Score XXL */}
-            <div 
-              className="flex flex-col items-center py-4 sm:py-8 lg:py-0 lg:px-4 xl:px-8 animate-fade-in"
-              style={{ animationDelay: '300ms' }}
-            >
+            {/* VS / Score */}
+            <div className="flex flex-col items-center justify-center">
               {match.status === 'upcoming' ? (
-                <div className="text-center">
-                  <p className="font-editorial text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                <div className="text-center p-8 rounded-3xl glass border-white/5 bg-white/[0.02]">
+                  <div className="text-6xl lg:text-8xl font-black tracking-tighter bg-gradient-to-b from-white to-slate-500 bg-clip-text text-transparent mb-2">
                     {match.time}
-                  </p>
-                  <p className="text-muted text-sm sm:text-base md:text-lg mt-3 sm:mt-4 tracking-wide">{match.date}</p>
+                  </div>
+                  <div className="text-slate-400 font-medium tracking-widest uppercase">{match.date}</div>
                 </div>
               ) : (
-                <div className="relative">
-                  {/* Score container with glow */}
-                  <div className="flex items-center gap-3 sm:gap-4 md:gap-8 lg:gap-10 xl:gap-12">
-                    <span className="
-                      font-editorial 
-                      text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] xl:text-[12rem] 
-                      font-black leading-none 
-                      bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent 
-                      drop-shadow-2xl
-                    ">
-                      {match.homeScore}
-                    </span>
-                    <span className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white/30 font-thin">—</span>
-                    <span className="
-                      font-editorial 
-                      text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] xl:text-[12rem] 
-                      font-black leading-none 
-                      bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent 
-                      drop-shadow-2xl
-                    ">
-                      {match.awayScore}
-                    </span>
-                  </div>
-                  
-                  {/* Live indicator */}
-                  {match.status === 'live' && (
-                    <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2">
-                      <span className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-accent-live/20 backdrop-blur-sm rounded-full border border-accent-live/30">
-                        <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-accent-live rounded-full animate-pulse-live" />
-                        <span className="text-accent-live font-bold text-xs sm:text-sm tracking-wider">
-                          45&apos; + 2
-                        </span>
-                      </span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-4 text-7xl lg:text-9xl font-black tracking-tighter">
+                  <span className={(match.homeScore ?? 0) > (match.awayScore ?? 0) ? 'text-accent-live' : 'text-white'}>
+                    {match.homeScore ?? 0}
+                  </span>
+                  <span className="text-slate-700 text-4xl lg:text-6xl">:</span>
+                  <span className={(match.awayScore ?? 0) > (match.homeScore ?? 0) ? 'text-accent-live' : 'text-white'}>
+                    {match.awayScore ?? 0}
+                  </span>
                 </div>
               )}
+              
+              {/* Venue */}
+              <div className="mt-8 flex items-center gap-2 text-slate-400 text-sm font-medium px-4 py-2 rounded-full bg-white/5 border border-white/5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                {match.venue || 'Stade Principal'}
+              </div>
             </div>
 
-            {/* Away Team - Clickable */}
+            {/* Away Team */}
             <Link 
               href={`/team/${awayTeamSlug}`}
-              className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-8 xl:pl-12 animate-fade-in group/away"
-              style={{ animationDelay: '400ms' }}
+              className="group flex flex-col items-center lg:items-start text-center lg:text-left"
             >
-              <div className="relative mb-4 sm:mb-6">
-                <div className="
-                  w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 
-                  bg-white/5 backdrop-blur-sm rounded-full 
-                  flex items-center justify-center 
-                  text-3xl sm:text-5xl md:text-6xl lg:text-7xl 
-                  border border-white/10 shadow-2xl
-                  group-hover/away:scale-105 group-hover/away:border-accent-live/50 transition-all duration-300
-                ">
+               <div className="relative mb-6 transform group-hover:scale-105 transition-transform duration-500">
+                <div className="w-32 h-32 lg:w-40 lg:h-40 glass rounded-full flex items-center justify-center text-6xl shadow-2xl shadow-accent-orange/10 border border-white/5 group-hover:border-accent-orange/30 transition-colors">
                   {match.awayTeam.logo}
                 </div>
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-accent-live/20 rounded-full blur-xl -z-10 group-hover/away:bg-accent-live/40 transition-colors" />
+                <div className="absolute inset-0 rounded-full bg-accent-orange/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <h2 className="font-editorial text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 tracking-tight group-hover/away:text-accent-live transition-colors">
+              <h2 className="text-3xl lg:text-5xl font-black tracking-tighter mb-2 group-hover:text-accent-orange transition-colors">
                 {match.awayTeam.name}
               </h2>
-              <span className="text-muted text-xs sm:text-sm md:text-base tracking-widest uppercase">
-                {match.awayTeam.shortName}
-              </span>
+              <p className="text-slate-400 font-medium tracking-widest uppercase text-sm">AWAY</p>
             </Link>
+
           </div>
 
           {/* CTA */}
-          <div 
-            className="flex justify-center mt-10 sm:mt-16 lg:mt-20 animate-fade-in"
-            style={{ animationDelay: '500ms' }}
-          >
-            <Link href={`/match/${match.id}`}>
-              <PrimaryButton
-                size="lg"
-                rightIcon={
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                }
-                className="group text-sm sm:text-base"
-              >
-                Suivre le match
-              </PrimaryButton>
-            </Link>
-          </div>
+          <Link href={`/match/${match.id}`}>
+            <PrimaryButton className="px-8 py-4 text-lg shadow-xl shadow-accent-live/20 hover:scale-105 transition-transform">
+              VOIR LE MATCH
+            </PrimaryButton>
+          </Link>
         </div>
       </div>
     </section>

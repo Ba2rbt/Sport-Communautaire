@@ -48,35 +48,34 @@ const mockFanZones: FanZoneCommunity[] = [
     id: 'asse',
     name: 'Magic Fans',
     team: 'AS Saint-Étienne',
-    teamLogo: '💚',
+    teamLogo: '�',
     members: 22100,
-    posts: 7600,
+    posts: 7400,
     isLive: false,
-    coverColor: 'from-green-600 to-green-900',
+    coverColor: 'from-green-600 to-green-800',
   },
   {
-    id: 'losc',
-    name: 'Dogues Virage Est',
-    team: 'LOSC Lille',
-    teamLogo: '🐕',
-    members: 18900,
-    posts: 5400,
-    isLive: false,
-    coverColor: 'from-red-700 to-blue-900',
-  },
-  {
-    id: 'rcl',
+    id: 'lens',
     name: 'Red Tigers',
     team: 'RC Lens',
     teamLogo: '🟡',
-    members: 24300,
-    posts: 6800,
+    members: 19800,
+    posts: 6200,
     isLive: true,
-    coverColor: 'from-yellow-500 to-red-600',
+    coverColor: 'from-red-600 to-yellow-500',
+  },
+  {
+    id: 'nantes',
+    name: 'Brigade Loire',
+    team: 'FC Nantes',
+    teamLogo: '🐤',
+    members: 15600,
+    posts: 4800,
+    isLive: false,
+    coverColor: 'from-yellow-400 to-green-600',
   },
 ]
 
-// Fan zone locations for map
 const mockFanZoneLocations: FanZoneLocation[] = [
   {
     id: 'fz-1',
@@ -174,42 +173,49 @@ function FanZoneCard({ fanzone }: { fanzone: FanZoneCommunity }) {
   return (
     <Link 
       href={`/fanzones/${fanzone.id}`}
-      className="block bg-white border border-editorial rounded-lg overflow-hidden hover-lift"
+      className="group relative block overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-accent-sport/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
     >
-      {/* Cover */}
-      <div className={`h-24 bg-gradient-to-r ${fanzone.coverColor} relative`}>
-        {fanzone.isLive && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 bg-accent-live text-white text-xs font-bold rounded-full">
-            <span className="w-2 h-2 bg-white rounded-full animate-pulse-live" />
-            LIVE
-          </div>
-        )}
-        <div className="absolute -bottom-6 left-6 w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center text-3xl border-2 border-white">
+      {/* Cover Gradient */}
+      <div className={`h-32 w-full bg-gradient-to-br ${fanzone.coverColor} opacity-80 group-hover:opacity-100 transition-opacity duration-500`} />
+      
+      {/* Logo Container */}
+      <div className="absolute top-20 left-6">
+        <div className="w-16 h-16 bg-[#0f172a] rounded-xl flex items-center justify-center text-3xl shadow-xl border border-white/10 group-hover:scale-110 transition-transform duration-300 group-hover:border-accent-sport/50">
           {fanzone.teamLogo}
         </div>
       </div>
 
+      {/* Live Badge */}
+      {fanzone.isLive && (
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-red-500/90 text-white text-xs font-bold rounded-full shadow-lg border border-red-400/50 backdrop-blur-sm animate-pulse">
+          <span className="w-1.5 h-1.5 bg-white rounded-full" />
+          LIVE
+        </div>
+      )}
+
       {/* Content */}
-      <div className="pt-10 pb-6 px-6">
-        <h3 className="font-editorial text-xl font-bold text-primary mb-1">
+      <div className="pt-8 pb-6 px-6">
+        <h3 className="text-xl font-bold text-white mb-1 group-hover:text-accent-sport transition-colors line-clamp-1">
           {fanzone.name}
         </h3>
-        <p className="text-sm text-muted mb-4">{fanzone.team}</p>
+        <p className="text-sm text-slate-400 mb-6 font-medium tracking-wide uppercase text-xs">
+          {fanzone.team}
+        </p>
         
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span className="text-muted">{fanzone.members.toLocaleString()}</span>
+        <div className="flex items-center justify-between border-t border-white/5 pt-4">
+          <div className="flex flex-col">
+             <span className="text-lg font-bold text-white">{fanzone.members.toLocaleString()}</span>
+             <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">Membres</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className="text-muted">{fanzone.posts.toLocaleString()} posts</span>
+          <div className="w-px h-8 bg-white/5" />
+          <div className="flex flex-col items-end">
+             <span className="text-lg font-bold text-white">{fanzone.posts.toLocaleString()}</span>
+             <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">Posts</span>
           </div>
         </div>
+        
+        {/* Hover Action */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-accent-sport transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
       </div>
     </Link>
   )
@@ -221,90 +227,93 @@ export const metadata = {
 }
 
 export default function FanZonesPage() {
-  const liveFanZones = mockFanZones.filter(fz => fz.isLive)
-  const otherFanZones = mockFanZones.filter(fz => !fz.isLive)
-
   return (
-    <div className="space-y-12">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="font-editorial text-5xl font-bold text-primary mb-4">
-          FanZones
-        </h1>
-        <p className="text-muted text-lg max-w-2xl mx-auto">
-          Rejoignez la communauté de supporters de votre équipe favorite.
-        </p>
-      </div>
-
-      {/* Live FanZones */}
-      {liveFanZones.length > 0 && (
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="font-editorial text-2xl font-bold text-primary">
-              En direct
-            </h2>
-            <span className="flex items-center gap-1.5 px-3 py-1 bg-accent-live/10 text-accent-live text-sm font-bold rounded-full">
-              <span className="w-2 h-2 bg-accent-live rounded-full animate-pulse-live" />
-              {liveFanZones.length} actives
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {liveFanZones.map((fanzone) => (
-              <FanZoneCard key={fanzone.id} fanzone={fanzone} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Map Section */}
-      <section className="bg-white border border-editorial rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-editorial bg-secondary/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent-sport rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="font-editorial text-2xl font-bold text-primary">
-                Trouvez un bar près de chez vous
-              </h2>
-              <p className="text-sm text-muted">
-                Bars et restaurants pour regarder les matchs
+    <div className="min-h-screen bg-[#020617] text-white overflow-hidden selection:bg-accent-sport/30">
+      
+      {/* Hero Header */}
+      <div className="relative border-b border-white/5 bg-[#020617]/80 backdrop-blur-sm z-20">
+        <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-sport/10 border border-accent-sport/20 text-accent-sport text-xs font-bold uppercase tracking-widest">
+                <span className="w-2 h-2 rounded-full bg-accent-sport animate-pulse shadow-[0_0_10px_currentColor]" />
+                Fans & Ultras
+              </div>
+              <h1 className="text-5xl md:text-7xl font-sans font-bold text-white tracking-tighter">
+                Fan<span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-sport to-purple-500">Zones</span>
+              </h1>
+              <p className="text-slate-400 text-xl font-light leading-relaxed">
+                Trouvez les meilleurs lieux pour vivre les matchs. Rejoignez les tribunes virtuelles et vibrez avec votre communauté.
               </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-4">
+              <Link href="/fanzones/map" className="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-white/10">
+                Explorer La Carte
+              </Link>
+              <Link href="/fanzones/create" className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold rounded-xl hover:bg-white/5 hover:border-white/40 transition-all">
+                Créer un Groupe
+              </Link>
             </div>
           </div>
         </div>
-        <FanZonesMapSection fanZoneLocations={mockFanZoneLocations} />
-      </section>
 
-      {/* All FanZones */}
-      <section>
-        <h2 className="font-editorial text-2xl font-bold text-primary mb-6">
-          Toutes les communautés
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {otherFanZones.map((fanzone) => (
+        {/* Decorative Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none -z-10 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      </div>
+
+      {/* Map Preview Section */}
+      <div className="h-[400px] w-full relative bg-slate-900 overflow-hidden border-y border-white/5 group">
+         {/* Fake Map UI */}
+         <div className="absolute inset-0 bg-[#050b1d]">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-[#020617]/50 to-[#020617]" />
+             {/* Random Dots mimicking locations - static for SSR safety */}
+             <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-accent-sport rounded-full animate-ping" />
+             <div className="absolute bottom-1/3 right-1/4 w-2 h-2 bg-purple-500 rounded-full animate-ping delay-700" />
+             <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-green-500 rounded-full animate-ping delay-300" />
+         </div>
+         
+         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-700 group-hover:backdrop-blur-none group-hover:bg-black/20">
+             <div className="text-center transform transition-transform duration-500 group-hover:scale-110">
+                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20 backdrop-blur-md">
+                    <span className="text-3xl">🗺️</span>
+                 </div>
+                 <h3 className="text-2xl font-bold text-white mb-2">Carte Interactive</h3>
+                 <p className="text-slate-300 mb-6 max-w-md mx-auto">Trouvez les bars, pubs et lieux de rassemblement autour de vous.</p>
+                 <Link href="/fanzones/map" className="inline-flex items-center gap-2 px-6 py-2 bg-accent-sport/20 border border-accent-sport/50 text-accent-sport font-bold rounded-lg hover:bg-accent-sport hover:text-white transition-all">
+                    Ouvrir la carte
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                 </Link>
+             </div>
+         </div>
+      </div>
+
+      {/* Popular Groups Grid */}
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="flex items-end justify-between mb-10">
+            <div>
+                <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <span className="text-accent-sport">🔥</span> 
+                Groupes Populaires
+                </h2>
+                <p className="text-slate-400">Rejoignez les communautés les plus actives du moment</p>
+            </div>
+            <Link href="/fanzones/all" className="hidden md:flex items-center gap-2 text-sm font-bold text-white hover:text-accent-sport transition-colors uppercase tracking-wider">
+                Voir tout <span className="text-lg">→</span>
+            </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {mockFanZones.map((fanzone) => (
             <FanZoneCard key={fanzone.id} fanzone={fanzone} />
           ))}
         </div>
-      </section>
 
-      {/* Create FanZone CTA */}
-      <div className="text-center py-12 bg-gradient-to-r from-accent-sport/10 to-accent-mvp/10 border border-editorial rounded-lg">
-        <h2 className="font-editorial text-2xl font-bold text-primary mb-4">
-          Votre équipe n&apos;est pas listée ?
-        </h2>
-        <p className="text-muted mb-6">
-          Créez une FanZone pour rassembler les supporters.
-        </p>
-        <button className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 transition-colors">
-          Créer une FanZone
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
+        <div className="mt-12 text-center md:hidden">
+            <Link href="/fanzones/all" className="inline-block px-8 py-3 bg-white/5 border border-white/10 text-white font-bold rounded-lg">
+                Voir tous les groupes
+            </Link>
+        </div>
       </div>
     </div>
   )

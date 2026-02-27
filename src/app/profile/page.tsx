@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Gérez votre profil, vos favoris et consultez votre historique de votes.',
 }
 
-// Mock data for demo
+// Mock data generator (kept from original)
 function getMockData(userId: string) {
   const profile: UserProfile = {
     id: userId,
@@ -83,12 +83,14 @@ export default async function ProfilePage() {
   }
 
   return (
-    <ProfileClient 
-      initialProfile={realProfile}
-      initialStats={stats}
-      initialFavorites={favorites}
-      initialVoteHistory={voteHistory}
-      userId={user.id}
-    />
+    <div className="min-h-screen bg-[#020617] pt-24 pb-12 px-6">
+      <ProfileClient 
+        initialProfile={realProfile}
+        initialStats={stats}
+        initialFavorites={favorites}
+        initialVoteHistory={voteHistory}
+        userId={user.id}
+      />
+    </div>
   )
 }

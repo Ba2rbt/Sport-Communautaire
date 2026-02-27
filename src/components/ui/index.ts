@@ -10,6 +10,10 @@ export { Badge, BadgeMVP, BadgeLive } from './Badge'
 // Tags
 export { Tag, TagLigue } from './Tag'
 
+// Alias pour la feuille de route
+export { Tag as TagSport } from './Tag'
+export { CardEvent as CardFight } from './CardEvent'
+
 // Filters
 export { SidebarFilters } from './SidebarFilters'
 

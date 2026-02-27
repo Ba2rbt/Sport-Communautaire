@@ -143,86 +143,88 @@ export const metadata = {
 }
 
 export default function ExpertsPage() {
-  const featuredArticle = mockArticles.find(a => a.isFeatured)
-  const regularArticles = mockArticles.filter(a => !a.isFeatured)
-  const latestArticles = regularArticles.slice(0, 3)
-  const moreArticles = regularArticles.slice(3)
+  const featuredArticle = mockArticles[0]
+  const otherArticles = mockArticles.slice(1)
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Magazine Header */}
-      <header className="text-center mb-12">
-        <p className="text-accent-sport font-semibold tracking-widest uppercase text-sm mb-2">
-          SportUnion Magazine
-        </p>
-        <h1 className="font-editorial text-5xl md:text-7xl font-black text-primary mb-4">
-          Experts
-        </h1>
-        <p className="text-muted text-lg max-w-2xl mx-auto">
-          Analyses approfondies, interviews exclusives et regards d'experts sur l'actualité sportive.
-        </p>
-        <div className="w-24 h-1 bg-primary mx-auto mt-6" />
-      </header>
-
-      {/* Featured Article */}
-      {featuredArticle && (
-        <section className="mb-16">
-          <ArticleCard article={featuredArticle} variant="featured" />
-        </section>
-      )}
-
-      {/* Latest Articles */}
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-editorial text-3xl font-bold text-primary">
-            Dernières analyses
-          </h2>
-          <Link 
-            href="/experts/all" 
-            className="text-accent-sport font-medium hover:underline"
-          >
-            Voir tout →
-          </Link>
+    <div className="min-h-screen bg-[#020617] text-white selection:bg-purple-500/30">
+        {/* Magazine Header */}
+        <div className="border-b border-white/5 py-8">
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+                <span className="text-sm font-mono text-slate-500 uppercase tracking-widest">Édition Hebdomadaire</span>
+                <span className="text-sm font-mono text-slate-500 uppercase tracking-widest">{new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
+            </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {latestArticles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
+
+        <div className="max-w-7xl mx-auto px-6 py-12">
+            <h1 className="text-[10vw] leading-[0.8] font-bold text-white tracking-tighter mb-16 opacity-90">
+                INSIGHTS<br/>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-600 ml-20">EXPERT</span>
+            </h1>
+
+            {/* Featured Article - Magazine Cover Style */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-end">
+                <div className="relative aspect-[4/5] rounded-none overflow-hidden group">
+                    <img 
+                        src={featuredArticle.coverImage} 
+                        alt={featuredArticle.title} 
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-50" />
+                </div>
+                
+                <div className="space-y-8 lg:pb-12">
+                     <span className="inline-block px-3 py-1 bg-white text-black text-xs font-bold uppercase tracking-widest">
+                        À la une
+                     </span>
+                     <h2 className="text-4xl md:text-5xl font-bold font-serif leading-tight">
+                        {featuredArticle.title}
+                     </h2>
+                     <p className="text-xl text-slate-400 font-serif italic border-l-4 border-purple-500 pl-6">
+                        {featuredArticle.excerpt}
+                     </p>
+                     
+                     <div className="flex items-center gap-4 pt-4">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-800">
+                             {/* Avatar placeholder */}
+                             <div className="w-full h-full flex items-center justify-center bg-purple-900 text-purple-200">
+                                {featuredArticle.author.fullName.charAt(0)}
+                             </div>
+                        </div>
+                        <div>
+                            <p className="font-bold text-white">{featuredArticle.author.fullName}</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider">{featuredArticle.author.title}</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+            {/* Articles Grid - Minimalist */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 border-t border-white/10 pt-20">
+                {otherArticles.map((article) => (
+                    <article key={article.id} className="group cursor-pointer">
+                        <div className="aspect-video bg-slate-900 mb-6 overflow-hidden relative">
+                             <img 
+                                src={article.coverImage} 
+                                alt={article.title} 
+                                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                            />
+                        </div>
+                        <div className="flex items-center gap-3 mb-4">
+                             <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">{article.category}</span>
+                             <span className="text-xs text-slate-600">•</span>
+                             <span className="text-xs text-slate-500">{article.readTime} min de lecture</span>
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-3 leading-tight group-hover:text-purple-400 transition-colors">
+                            {article.title}
+                        </h3>
+                        <p className="text-slate-500 line-clamp-3">
+                            {article.excerpt}
+                        </p>
+                    </article>
+                ))}
+            </div>
         </div>
-      </section>
-
-      {/* More Articles Grid */}
-      {moreArticles.length > 0 && (
-        <section className="mb-16">
-          <h2 className="font-editorial text-3xl font-bold text-primary mb-8">
-            À lire aussi
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {moreArticles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* CTA for experts */}
-      <section className="bg-primary text-white rounded-2xl p-8 md:p-12 text-center">
-        <h2 className="font-editorial text-3xl font-bold mb-4">
-          Vous êtes expert sport ?
-        </h2>
-        <p className="text-white/70 mb-8 max-w-xl mx-auto">
-          Rejoignez notre équipe de consultants et partagez vos analyses avec notre communauté de passionnés.
-        </p>
-        <Link
-          href="/experts/create"
-          className="inline-flex items-center gap-2 px-8 py-3 bg-white text-primary font-bold rounded-full hover:bg-secondary transition-colors"
-        >
-          Devenir contributeur
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </Link>
-      </section>
     </div>
   )
 }

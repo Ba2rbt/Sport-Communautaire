@@ -12,17 +12,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-primary hover:bg-primary/90 text-white',
-  secondary: 'bg-secondary hover:bg-secondary/80 text-primary border border-editorial',
-  outline: 'bg-transparent border-2 border-primary hover:bg-primary hover:text-white text-primary',
-  ghost: 'bg-transparent hover:bg-primary/5 text-primary',
-  live: 'bg-accent-live hover:bg-accent-live/90 text-white shadow-lg shadow-accent-live/25',
+  primary: 'bg-gradient-to-r from-accent-live to-emerald-600 hover:to-emerald-500 text-white shadow-lg shadow-accent-live/20 hover:shadow-accent-live/40 border-0',
+  secondary: 'bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 hover:border-white/20 shadow-sm',
+  outline: 'bg-transparent border border-white/20 text-white hover:border-accent-live hover:text-accent-live',
+  ghost: 'bg-transparent hover:bg-white/5 text-slate-300 hover:text-white',
+  live: 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-lg shadow-red-500/30 animate-pulse-slow',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg',
+  sm: 'px-4 py-1.5 text-sm',
+  md: 'px-6 py-2.5 text-base',
+  lg: 'px-8 py-3.5 text-lg',
 }
 
 export const PrimaryButton = forwardRef<HTMLButtonElement, ButtonProps>(
