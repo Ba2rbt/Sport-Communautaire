@@ -3,11 +3,13 @@ export interface Team {
   name: string
   shortName: string
   logo: string
+  logoUrl?: string
 }
 
 export interface TeamStats {
   name: string
   logo: string
+  logoUrl?: string
   possession: number
   shots: number
   shotsOnTarget: number

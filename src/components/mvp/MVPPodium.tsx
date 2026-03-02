@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { MVPRanking } from '@/types/mvp'
 import { positionLabels } from '@/types/mvp'
 import { getPlayerSlug, getTeamSlug } from '@/lib/utils'
+import PlayerAvatar from '@/components/ui/PlayerAvatar'
 
 interface MVPPodiumProps {
   topThree: MVPRanking[]
@@ -18,9 +19,9 @@ function TrophyIcon({ rank }: { rank: number }) {
   }
 
   return (
-    <svg 
-      className={`w-12 h-12 ${colors[rank as keyof typeof colors] || 'text-muted'}`} 
-      fill="currentColor" 
+    <svg
+      className={`w-12 h-12 ${colors[rank as keyof typeof colors] || 'text-muted'}`}
+      fill="currentColor"
       viewBox="0 0 24 24"
     >
       <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
@@ -41,43 +42,43 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
   const teamSlug = getTeamSlug(player.teamName)
 
   return (
-    <div className={`flex flex-col items-center ${isCenter ? 'order-2' : player.rank === 2 ? 'order-1' : 'order-3'}`}>
+    <div
+      className={`flex flex-col items-center ${isCenter ? 'order-2' : player.rank === 2 ? 'order-1' : 'order-3'}`}
+    >
       {/* Trophy Badge */}
       <div className="mb-4">
         <TrophyIcon rank={player.rank} />
       </div>
 
       {/* Player Photo - Clickable */}
-      <Link 
+      <Link
         href={`/player/${playerSlug}`}
         className={`relative mb-4 ${isCenter ? 'w-32 h-32' : 'w-24 h-24'} group/photo`}
       >
-        <div className={`absolute inset-0 rounded-full ${podiumColors[player.rank as keyof typeof podiumColors]} opacity-30 blur-xl group-hover/photo:opacity-50 transition-opacity`} />
-        {player.photoUrl ? (
-          <img 
-            src={player.photoUrl} 
-            alt={player.playerName}
-            className={`relative w-full h-full rounded-full object-cover border-4 ${
-              player.rank === 1 ? 'border-yellow-400' : 
-              player.rank === 2 ? 'border-gray-300' : 'border-amber-600'
-            } shadow-xl group-hover/photo:scale-105 transition-transform`}
-          />
-        ) : (
-          <div className={`relative w-full h-full rounded-full bg-gradient-to-br from-primary to-accent-mvp flex items-center justify-center border-4 ${
-            player.rank === 1 ? 'border-yellow-400' : 
-            player.rank === 2 ? 'border-gray-300' : 'border-amber-600'
-          } shadow-xl group-hover/photo:scale-105 transition-transform`}>
-            <span className={`font-bold text-white ${isCenter ? 'text-3xl' : 'text-xl'}`}>
-              {player.jerseyNumber || player.playerName[0]}
-            </span>
-          </div>
-        )}
-        
+        <div
+          className={`absolute inset-0 rounded-full ${podiumColors[player.rank as keyof typeof podiumColors]} opacity-30 blur-xl group-hover/photo:opacity-50 transition-opacity`}
+        />
+        <PlayerAvatar
+          photoUrl={player.photoUrl}
+          name={player.playerName}
+          jerseyNumber={player.jerseyNumber}
+          size={isCenter ? 'hero' : 'xl'}
+          shape="circle"
+          className={`relative border-4 ${
+            player.rank === 1
+              ? 'border-yellow-400'
+              : player.rank === 2
+                ? 'border-gray-300'
+                : 'border-amber-600'
+          } shadow-xl group-hover/photo:scale-105 transition-transform bg-gradient-to-br from-primary to-accent-mvp`}
+        />
+
         {/* Rank Badge */}
-        <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg ${
-          player.rank === 1 ? 'bg-yellow-500' : 
-          player.rank === 2 ? 'bg-gray-400' : 'bg-amber-600'
-        }`}>
+        <div
+          className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg ${
+            player.rank === 1 ? 'bg-yellow-500' : player.rank === 2 ? 'bg-gray-400' : 'bg-amber-600'
+          }`}
+        >
           {player.rank}
         </div>
       </Link>
@@ -86,19 +87,23 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
       <div className="text-center mb-4">
         {/* Player Name - Clickable */}
         <Link href={`/player/${playerSlug}`}>
-          <h3 className={`font-editorial font-bold text-primary hover:text-accent-sport transition-colors ${isCenter ? 'text-2xl' : 'text-lg'}`}>
+          <h3
+            className={`font-editorial font-bold text-primary hover:text-accent-sport transition-colors ${isCenter ? 'text-2xl' : 'text-lg'}`}
+          >
             {player.playerName}
           </h3>
         </Link>
-        
+
         {/* Team Name - Clickable */}
         <Link href={`/team/${teamSlug}`}>
           <p className="text-muted text-sm hover:text-accent-sport transition-colors">
             {player.teamName}
           </p>
         </Link>
-        
-        <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-semibold rounded-full ${position?.color || 'bg-muted text-white'}`}>
+
+        <span
+          className={`inline-block mt-2 px-2 py-0.5 text-xs font-semibold rounded-full ${position?.color || 'bg-muted text-white'}`}
+        >
           {position?.label || player.position}
         </span>
       </div>
@@ -109,16 +114,14 @@ function PodiumPlayer({ player, isCenter }: { player: MVPRanking; isCenter: bool
           {player.totalVotes.toLocaleString()}
         </p>
         <p className="text-muted text-sm">votes</p>
-        <p className="text-accent-sport font-semibold text-lg">
-          {player.votePercentage}%
-        </p>
+        <p className="text-accent-sport font-semibold text-lg">{player.votePercentage}%</p>
       </div>
 
       {/* Podium Block */}
-      <div className={`w-full max-w-[140px] ${podiumHeights[player.rank as keyof typeof podiumHeights]} ${podiumColors[player.rank as keyof typeof podiumColors]} rounded-t-lg flex items-end justify-center pb-4 shadow-lg`}>
-        <span className="text-white font-black text-4xl opacity-50">
-          {player.rank}
-        </span>
+      <div
+        className={`w-full max-w-[140px] ${podiumHeights[player.rank as keyof typeof podiumHeights]} ${podiumColors[player.rank as keyof typeof podiumColors]} rounded-t-lg flex items-end justify-center pb-4 shadow-lg`}
+      >
+        <span className="text-white font-black text-4xl opacity-50">{player.rank}</span>
       </div>
     </div>
   )
@@ -160,11 +163,7 @@ export default function MVPPodium({ topThree, competitionName }: MVPPodiumProps)
       {/* Podium */}
       <div className="flex items-end justify-center gap-4 md:gap-8 px-4">
         {podiumPlayers.map((player) => (
-          <PodiumPlayer 
-            key={player.playerId} 
-            player={player} 
-            isCenter={player.rank === 1}
-          />
+          <PodiumPlayer key={player.playerId} player={player} isCenter={player.rank === 1} />
         ))}
       </div>
     </section>

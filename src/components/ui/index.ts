@@ -21,10 +21,10 @@ export { SidebarFilters } from './SidebarFilters'
 export { TableStats, RankCell, PlayerCell, StatCell } from './TableStats'
 
 // Skeletons
-export { 
-  Skeleton, 
-  MatchCardSkeleton, 
-  MatchGridSkeleton, 
+export {
+  Skeleton,
+  MatchCardSkeleton,
+  MatchGridSkeleton,
   SidebarSkeleton,
   HeroSkeleton,
   ArticleCardSkeleton,
@@ -32,8 +32,12 @@ export {
   TableSkeleton,
   TableRowSkeleton,
   CommentSkeleton,
-  PageLoadingSkeleton
+  PageLoadingSkeleton,
 } from './Skeleton'
 
 // Links
 export { TeamLink, PlayerLink } from './TeamLink'
+
+// Avatars & Logos
+export { default as PlayerAvatar } from './PlayerAvatar'
+export { default as TeamLogo } from './TeamLogo'

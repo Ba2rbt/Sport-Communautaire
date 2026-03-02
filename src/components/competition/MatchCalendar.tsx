@@ -3,6 +3,7 @@
 import { useState, MouseEvent } from 'react'
 import type { CompetitionMatch } from '@/types/competition'
 import { BadgeLive } from '@/components/ui'
+import TeamLogo from '@/components/ui/TeamLogo'
 import Link from 'next/link'
 import { getTeamSlug } from '@/lib/utils'
 
@@ -11,22 +12,25 @@ interface MatchCalendarProps {
   competitionId: string
 }
 
-function TeamLink({ teamName, shortName, logo, onClick }: { 
+function TeamLinkLocal({
+  teamName,
+  shortName,
+  logo,
+  logoUrl,
+  onClick,
+}: {
   teamName: string
   shortName: string
   logo: string
+  logoUrl?: string
   onClick: (e: MouseEvent) => void
 }) {
   const slug = getTeamSlug(teamName)
-  
+
   return (
-    <Link 
-      href={`/team/${slug}`}
-      onClick={onClick}
-      className="flex items-center gap-3 group/team"
-    >
-      <span className="w-8 h-8 flex items-center justify-center text-xl group-hover/team:scale-110 transition-transform">
-        {logo}
+    <Link href={`/team/${slug}`} onClick={onClick} className="flex items-center gap-3 group/team">
+      <span className="w-8 h-8 flex items-center justify-center group-hover/team:scale-110 transition-transform">
+        <TeamLogo logoUrl={logoUrl} logo={logo} name={teamName} size="sm" />
       </span>
       <span className="font-medium text-primary group-hover/team:text-accent-sport transition-colors">
         {shortName}
@@ -45,7 +49,7 @@ function MatchCard({ match }: { match: CompetitionMatch }) {
   }
 
   return (
-    <Link 
+    <Link
       href={`/match/${match.id}`}
       className="block flex-shrink-0 w-72 bg-white border border-editorial rounded-lg overflow-hidden hover-lift"
     >
@@ -53,44 +57,46 @@ function MatchCard({ match }: { match: CompetitionMatch }) {
       <div className="px-4 py-2 bg-secondary/30 border-b border-editorial flex items-center justify-between">
         <span className="text-xs text-muted font-medium">{match.round}</span>
         {isLive && <BadgeLive size="sm" />}
-        {isFinished && (
-          <span className="text-xs font-medium text-muted">Terminé</span>
-        )}
-        {isUpcoming && (
-          <span className="text-xs font-medium text-accent-sport">{match.time}</span>
-        )}
+        {isFinished && <span className="text-xs font-medium text-muted">Terminé</span>}
+        {isUpcoming && <span className="text-xs font-medium text-accent-sport">{match.time}</span>}
       </div>
 
       {/* Teams */}
       <div className="p-4">
         {/* Home Team */}
         <div className="flex items-center justify-between mb-3">
-          <TeamLink 
+          <TeamLinkLocal
             teamName={match.homeTeam.name}
             shortName={match.homeTeam.shortName}
             logo={match.homeTeam.logo}
+            logoUrl={match.homeTeam.logoUrl}
             onClick={handleTeamClick}
           />
-          <span className={`
+          <span
+            className={`
             text-xl font-bold
             ${isLive ? 'text-accent-live' : 'text-primary'}
-          `}>
+          `}
+          >
             {match.homeScore ?? '-'}
           </span>
         </div>
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
-          <TeamLink 
+          <TeamLinkLocal
             teamName={match.awayTeam.name}
             shortName={match.awayTeam.shortName}
             logo={match.awayTeam.logo}
+            logoUrl={match.awayTeam.logoUrl}
             onClick={handleTeamClick}
           />
-          <span className={`
+          <span
+            className={`
             text-xl font-bold
             ${isLive ? 'text-accent-live' : 'text-primary'}
-          `}>
+          `}
+          >
             {match.awayScore ?? '-'}
           </span>
         </div>
@@ -104,10 +110,13 @@ function MatchCard({ match }: { match: CompetitionMatch }) {
   )
 }
 
-export default function MatchCalendar({ matches, competitionId }: MatchCalendarProps) {
+export default function MatchCalendar({
+  matches,
+  competitionId: _competitionId,
+}: MatchCalendarProps) {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'finished'>('all')
 
-  const filteredMatches = matches.filter(match => {
+  const filteredMatches = matches.filter((match) => {
     if (filter === 'all') return true
     if (filter === 'upcoming') return match.status === 'upcoming' || match.status === 'live'
     if (filter === 'finished') return match.status === 'finished'
@@ -115,22 +124,23 @@ export default function MatchCalendar({ matches, competitionId }: MatchCalendarP
   })
 
   // Group matches by round
-  const matchesByRound = filteredMatches.reduce((acc, match) => {
-    if (!acc[match.round]) {
-      acc[match.round] = []
-    }
-    acc[match.round].push(match)
-    return acc
-  }, {} as Record<string, CompetitionMatch[]>)
+  const matchesByRound = filteredMatches.reduce(
+    (acc, match) => {
+      if (!acc[match.round]) {
+        acc[match.round] = []
+      }
+      acc[match.round].push(match)
+      return acc
+    },
+    {} as Record<string, CompetitionMatch[]>
+  )
 
   return (
     <div className="bg-white border border-editorial rounded-lg overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-editorial flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="font-editorial text-xl font-bold text-primary">
-          Calendrier
-        </h2>
-        
+        <h2 className="font-editorial text-xl font-bold text-primary">Calendrier</h2>
+
         {/* Filters */}
         <div className="flex items-center gap-2">
           {(['all', 'upcoming', 'finished'] as const).map((f) => (
@@ -139,9 +149,10 @@ export default function MatchCalendar({ matches, competitionId }: MatchCalendarP
               onClick={() => setFilter(f)}
               className={`
                 px-4 py-1.5 text-sm font-medium rounded-full transition-colors
-                ${filter === f 
-                  ? 'bg-accent-sport text-white' 
-                  : 'bg-secondary text-muted hover:bg-secondary/80'
+                ${
+                  filter === f
+                    ? 'bg-accent-sport text-white'
+                    : 'bg-secondary text-muted hover:bg-secondary/80'
                 }
               `}
             >
@@ -168,8 +179,18 @@ export default function MatchCalendar({ matches, competitionId }: MatchCalendarP
 
         {Object.keys(matchesByRound).length === 0 && (
           <div className="p-12 text-center">
-            <svg className="w-12 h-12 mx-auto text-muted/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-12 h-12 mx-auto text-muted/30 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
             <p className="text-muted">Aucun match trouvé</p>
           </div>

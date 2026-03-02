@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import TeamLogo from '@/components/ui/TeamLogo'
 import type { User } from '@supabase/supabase-js'
 
 interface Team {
@@ -9,6 +10,7 @@ interface Team {
   name: string
   shortName: string
   logo: string
+  logoUrl?: string
 }
 
 interface MVPVoteProps {
@@ -81,9 +83,9 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
       if (userVote === teamId) {
         // Remove vote
         if (teamId === homeTeam.id) {
-          setHomeVotes(prev => prev - 1)
+          setHomeVotes((prev) => prev - 1)
         } else {
-          setAwayVotes(prev => prev - 1)
+          setAwayVotes((prev) => prev - 1)
         }
         setUserVote(null)
       } else {
@@ -91,16 +93,16 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
         if (userVote) {
           // Remove old vote
           if (userVote === homeTeam.id) {
-            setHomeVotes(prev => prev - 1)
+            setHomeVotes((prev) => prev - 1)
           } else {
-            setAwayVotes(prev => prev - 1)
+            setAwayVotes((prev) => prev - 1)
           }
         }
         // Add new vote
         if (teamId === homeTeam.id) {
-          setHomeVotes(prev => prev + 1)
+          setHomeVotes((prev) => prev + 1)
         } else {
-          setAwayVotes(prev => prev + 1)
+          setAwayVotes((prev) => prev + 1)
         }
         setUserVote(teamId)
       }
@@ -137,21 +139,31 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
             disabled={isLoading}
             className={`
               relative p-6 rounded-xl border-2 transition-all duration-300
-              ${userVote === homeTeam.id 
-                ? 'border-accent-sport bg-accent-sport/5 shadow-lg shadow-accent-sport/20' 
-                : 'border-editorial hover:border-accent-sport/50 hover:bg-secondary/50'
+              ${
+                userVote === homeTeam.id
+                  ? 'border-accent-sport bg-accent-sport/5 shadow-lg shadow-accent-sport/20'
+                  : 'border-editorial hover:border-accent-sport/50 hover:bg-secondary/50'
               }
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
           >
             <div className="flex flex-col items-center gap-3">
-              <span className="text-4xl">{homeTeam.logo}</span>
+              <TeamLogo
+                logoUrl={homeTeam.logoUrl}
+                logo={homeTeam.logo}
+                name={homeTeam.name}
+                size="lg"
+              />
               <span className="font-semibold text-primary">{homeTeam.shortName}</span>
             </div>
             {userVote === homeTeam.id && (
               <div className="absolute top-2 right-2">
                 <svg className="w-6 h-6 text-accent-sport" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             )}
@@ -163,21 +175,31 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
             disabled={isLoading}
             className={`
               relative p-6 rounded-xl border-2 transition-all duration-300
-              ${userVote === awayTeam.id 
-                ? 'border-accent-mvp bg-accent-mvp/5 shadow-lg shadow-accent-mvp/20' 
-                : 'border-editorial hover:border-accent-mvp/50 hover:bg-secondary/50'
+              ${
+                userVote === awayTeam.id
+                  ? 'border-accent-mvp bg-accent-mvp/5 shadow-lg shadow-accent-mvp/20'
+                  : 'border-editorial hover:border-accent-mvp/50 hover:bg-secondary/50'
               }
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
           >
             <div className="flex flex-col items-center gap-3">
-              <span className="text-4xl">{awayTeam.logo}</span>
+              <TeamLogo
+                logoUrl={awayTeam.logoUrl}
+                logo={awayTeam.logo}
+                name={awayTeam.name}
+                size="lg"
+              />
               <span className="font-semibold text-primary">{awayTeam.shortName}</span>
             </div>
             {userVote === awayTeam.id && (
               <div className="absolute top-2 right-2">
                 <svg className="w-6 h-6 text-accent-mvp" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             )}
@@ -192,11 +214,11 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
             <span className="font-semibold text-accent-mvp">{awayPercent}%</span>
           </div>
           <div className="flex h-3 rounded-full overflow-hidden bg-secondary">
-            <div 
+            <div
               className="bg-accent-sport transition-all duration-700 ease-out"
               style={{ width: `${homePercent}%` }}
             />
-            <div 
+            <div
               className="bg-accent-mvp transition-all duration-700 ease-out"
               style={{ width: `${awayPercent}%` }}
             />
@@ -218,10 +240,13 @@ export default function MVPVote({ matchId, homeTeam, awayTeam, user }: MVPVotePr
       {!user && (
         <div className="px-6 py-4 border-t border-editorial bg-secondary/30 text-center">
           <p className="text-sm text-muted">
-            <a href={`/login?redirectTo=/match/${matchId}`} className="text-accent-sport hover:underline font-medium">
+            <a
+              href={`/login?redirectTo=/match/${matchId}`}
+              className="text-accent-sport hover:underline font-medium"
+            >
               Connectez-vous
-            </a>
-            {' '}pour voter
+            </a>{' '}
+            pour voter
           </p>
         </div>
       )}

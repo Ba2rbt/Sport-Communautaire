@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import { BadgeLive, TagLigue } from '@/components/ui'
+import { BadgeLive, TagLigue, TeamLogo } from '@/components/ui'
 import { getTeamSlug } from '@/lib/utils'
 
 interface Team {
   name: string
   shortName: string
   logo: string
+  logoUrl?: string
 }
 
 interface MatchHeroProps {
@@ -47,7 +48,10 @@ export default function MatchHero({
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-accent-sport/20" />
-        <svg className="absolute inset-0 w-full h-full opacity-[0.02]" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          className="absolute inset-0 w-full h-full opacity-[0.02]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <pattern id="match-grid" width="80" height="80" patternUnits="userSpaceOnUse">
             <path d="M 80 0 L 0 0 0 80" fill="none" stroke="currentColor" strokeWidth="1" />
           </pattern>
@@ -77,13 +81,18 @@ export default function MatchHero({
         {/* Match Display */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-0">
           {/* Home Team - Clickable */}
-          <Link 
+          <Link
             href={`/team/${homeSlug}`}
             className="flex-1 flex flex-col items-center lg:items-end text-center lg:text-right group/home"
           >
             <div className="relative mb-4">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl group-hover/home:scale-105 group-hover/home:border-accent-sport/50 transition-all duration-300">
-                {homeTeam.logo}
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-2xl group-hover/home:scale-105 group-hover/home:border-accent-sport/50 transition-all duration-300">
+                <TeamLogo
+                  logoUrl={homeTeam.logoUrl}
+                  logo={homeTeam.logo}
+                  name={homeTeam.name}
+                  size="hero"
+                />
               </div>
               {isLive && (
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-accent-live rounded-full animate-pulse-live" />
@@ -109,43 +118,50 @@ export default function MatchHero({
             ) : (
               <>
                 <div className="flex items-center gap-6 md:gap-10">
-                  <span className={`
+                  <span
+                    className={`
                     font-editorial text-7xl md:text-9xl font-black leading-none
                     ${isLive ? 'text-accent-live' : 'text-white'}
-                  `}>
+                  `}
+                  >
                     {homeScore ?? 0}
                   </span>
                   <span className="text-4xl text-white/30 font-thin">—</span>
-                  <span className={`
+                  <span
+                    className={`
                     font-editorial text-7xl md:text-9xl font-black leading-none
                     ${isLive ? 'text-accent-live' : 'text-white'}
-                  `}>
+                  `}
+                  >
                     {awayScore ?? 0}
                   </span>
                 </div>
-                
+
                 {isLive && minute && (
                   <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-accent-live/20 rounded-full border border-accent-live/30">
                     <span className="w-2 h-2 bg-accent-live rounded-full animate-pulse-live" />
                     <span className="text-accent-live font-bold">{minute}&apos;</span>
                   </div>
                 )}
-                
-                {isFinished && (
-                  <p className="text-white/60 text-sm mt-4">Score final</p>
-                )}
+
+                {isFinished && <p className="text-white/60 text-sm mt-4">Score final</p>}
               </>
             )}
           </div>
 
           {/* Away Team - Clickable */}
-          <Link 
+          <Link
             href={`/team/${awaySlug}`}
             className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left group/away"
           >
             <div className="relative mb-4">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-6xl md:text-7xl border border-white/20 shadow-2xl group-hover/away:scale-105 group-hover/away:border-accent-live/50 transition-all duration-300">
-                {awayTeam.logo}
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-2xl group-hover/away:scale-105 group-hover/away:border-accent-live/50 transition-all duration-300">
+                <TeamLogo
+                  logoUrl={awayTeam.logoUrl}
+                  logo={awayTeam.logo}
+                  name={awayTeam.name}
+                  size="hero"
+                />
               </div>
             </div>
             <h2 className="font-editorial text-2xl md:text-3xl font-bold mb-1 group-hover/away:text-accent-live transition-colors">
@@ -161,15 +177,32 @@ export default function MatchHero({
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-white/60 text-sm">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
-            <span>{date} • {time}</span>
+            <span>
+              {date} • {time}
+            </span>
           </div>
           <span className="hidden sm:inline">•</span>
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
             <span>{venue}</span>
           </div>

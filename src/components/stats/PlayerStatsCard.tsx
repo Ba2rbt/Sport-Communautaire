@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import PlayerAvatar from '@/components/ui/PlayerAvatar'
+import TeamLogo from '@/components/ui/TeamLogo'
 
 interface PlayerStats {
   goals: number
@@ -27,6 +29,7 @@ interface PlayerStatsCardProps {
     team: {
       name: string
       logo?: string
+      logoUrl?: string
     }
     nationality?: string
     age?: number
@@ -36,24 +39,22 @@ interface PlayerStatsCardProps {
   season?: string
 }
 
-export default function PlayerStatsCard({ player, stats, season = '2024-25' }: PlayerStatsCardProps) {
+export default function PlayerStatsCard({
+  player,
+  stats,
+  season = '2024-25',
+}: PlayerStatsCardProps) {
   const [activeTab, setActiveTab] = useState<'attack' | 'defense' | 'general'>('attack')
 
-  const shootingAccuracy = stats.shotsTotal > 0 
-    ? Math.round((stats.shotsOnTarget / stats.shotsTotal) * 100) 
-    : 0
+  const shootingAccuracy =
+    stats.shotsTotal > 0 ? Math.round((stats.shotsOnTarget / stats.shotsTotal) * 100) : 0
 
-  const duelsWonPercent = stats.duelsTotal > 0 
-    ? Math.round((stats.duelsWon / stats.duelsTotal) * 100) 
-    : 0
+  const duelsWonPercent =
+    stats.duelsTotal > 0 ? Math.round((stats.duelsWon / stats.duelsTotal) * 100) : 0
 
-  const goalsPerMatch = stats.matches > 0 
-    ? (stats.goals / stats.matches).toFixed(2) 
-    : '0.00'
+  const goalsPerMatch = stats.matches > 0 ? (stats.goals / stats.matches).toFixed(2) : '0.00'
 
-  const minutesPerGoal = stats.goals > 0 
-    ? Math.round(stats.minutes / stats.goals) 
-    : 0
+  const minutesPerGoal = stats.goals > 0 ? Math.round(stats.minutes / stats.goals) : 0
 
   return (
     <div className="bg-white border border-editorial rounded-2xl overflow-hidden hover-lift animate-fade-in">
@@ -73,11 +74,13 @@ export default function PlayerStatsCard({ player, stats, season = '2024-25' }: P
           {/* Player photo */}
           <div className="relative">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center overflow-hidden">
-              {player.photo ? (
-                <img src={player.photo} alt={player.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl">⚽</span>
-              )}
+              <PlayerAvatar
+                photoUrl={player.photo}
+                emoji="⚽"
+                name={player.name}
+                size="xl"
+                shape="rounded"
+              />
             </div>
             {/* Jersey number */}
             <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-accent-live text-white rounded-lg flex items-center justify-center font-bold text-sm shadow-lg">
@@ -87,24 +90,33 @@ export default function PlayerStatsCard({ player, stats, season = '2024-25' }: P
 
           {/* Player info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-editorial text-xl sm:text-2xl font-bold truncate">
-              {player.name}
-            </h3>
+            <h3 className="font-editorial text-xl sm:text-2xl font-bold truncate">{player.name}</h3>
             <p className="text-white/70 text-sm mt-1">{player.position}</p>
             <div className="flex items-center gap-2 mt-3">
-              <span className="text-lg">{player.team.logo || '🏟️'}</span>
+              <TeamLogo
+                logoUrl={player.team.logoUrl}
+                logo={player.team.logo || '🏟️'}
+                name={player.team.name}
+                size="sm"
+              />
               <span className="text-sm text-white/80">{player.team.name}</span>
             </div>
           </div>
 
           {/* Rating badge */}
           <div className="text-center">
-            <div className={`
+            <div
+              className={`
               w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl
-              ${stats.rating >= 8 ? 'bg-accent-live text-white' : 
-                stats.rating >= 7 ? 'bg-yellow-400 text-primary' : 
-                'bg-white/20 text-white'}
-            `}>
+              ${
+                stats.rating >= 8
+                  ? 'bg-accent-live text-white'
+                  : stats.rating >= 7
+                    ? 'bg-yellow-400 text-primary'
+                    : 'bg-white/20 text-white'
+              }
+            `}
+            >
               {stats.rating.toFixed(1)}
             </div>
             <p className="text-[10px] text-white/60 mt-1 uppercase tracking-wider">Note</p>
@@ -128,10 +140,14 @@ export default function PlayerStatsCard({ player, stats, season = '2024-25' }: P
           { label: 'Minutes', value: stats.minutes },
         ].map((stat) => (
           <div key={stat.label} className="p-4 text-center">
-            <p className={`font-editorial text-2xl sm:text-3xl font-bold ${stat.highlight ? 'text-accent-live' : 'text-primary'}`}>
+            <p
+              className={`font-editorial text-2xl sm:text-3xl font-bold ${stat.highlight ? 'text-accent-live' : 'text-primary'}`}
+            >
               {stat.value}
             </p>
-            <p className="text-[10px] sm:text-xs text-muted uppercase tracking-wider mt-1">{stat.label}</p>
+            <p className="text-[10px] sm:text-xs text-muted uppercase tracking-wider mt-1">
+              {stat.label}
+            </p>
           </div>
         ))}
       </div>
@@ -144,9 +160,11 @@ export default function PlayerStatsCard({ player, stats, season = '2024-25' }: P
             onClick={() => setActiveTab(tab)}
             className={`
               flex-1 py-3 text-xs sm:text-sm font-medium uppercase tracking-wider transition-all
-              ${activeTab === tab 
-                ? 'text-accent-sport border-b-2 border-accent-sport bg-accent-sport/5' 
-                : 'text-muted hover:text-primary hover:bg-secondary/50'}
+              ${
+                activeTab === tab
+                  ? 'text-accent-sport border-b-2 border-accent-sport bg-accent-sport/5'
+                  : 'text-muted hover:text-primary hover:bg-secondary/50'
+              }
             `}
           >
             {tab === 'attack' ? '⚡ Attaque' : tab === 'defense' ? '🛡️ Défense' : '📊 Général'}
@@ -159,7 +177,10 @@ export default function PlayerStatsCard({ player, stats, season = '2024-25' }: P
         {activeTab === 'attack' && (
           <>
             <StatRow label="Buts / Match" value={goalsPerMatch} />
-            <StatRow label="Minutes / But" value={minutesPerGoal > 0 ? `${minutesPerGoal}'` : '-'} />
+            <StatRow
+              label="Minutes / But"
+              value={minutesPerGoal > 0 ? `${minutesPerGoal}'` : '-'}
+            />
             <StatBar label="Précision tirs" value={shootingAccuracy} color="accent-live" />
             <StatRow label="Tirs cadrés" value={`${stats.shotsOnTarget} / ${stats.shotsTotal}`} />
           </>
@@ -206,9 +227,17 @@ function StatBar({ label, value, color }: { label: string; value: number; color:
         <span className="font-bold text-primary">{value}%</span>
       </div>
       <div className="h-2 bg-secondary rounded-full overflow-hidden">
-        <div 
+        <div
           className={`h-full bg-${color} rounded-full transition-all duration-500`}
-          style={{ width: `${value}%`, backgroundColor: color === 'accent-live' ? '#00b140' : color === 'accent-sport' ? '#0066cc' : '#ff6200' }}
+          style={{
+            width: `${value}%`,
+            backgroundColor:
+              color === 'accent-live'
+                ? '#00b140'
+                : color === 'accent-sport'
+                  ? '#0066cc'
+                  : '#ff6200',
+          }}
         />
       </div>
     </div>

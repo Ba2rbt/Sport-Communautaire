@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { Standing, FormResult } from '@/types/competition'
 import { getTeamSlug } from '@/lib/utils'
+import TeamLogo from '@/components/ui/TeamLogo'
 
 interface StandingsTableProps {
   standings: Standing[]
@@ -28,22 +29,27 @@ function FormBadge({ result }: { result: FormResult }) {
   }
 
   return (
-    <span className={`
+    <span
+      className={`
       w-6 h-6 flex items-center justify-center
       text-xs font-bold rounded
       ${styles[result]}
-    `}>
+    `}
+    >
       {labels[result]}
     </span>
   )
 }
 
-function PositionBadge({ position, highlights }: { 
+function PositionBadge({
+  position,
+  highlights,
+}: {
   position: number
   highlights?: StandingsTableProps['highlightPositions']
 }) {
   let bgColor = 'bg-secondary'
-  
+
   if (highlights) {
     if (highlights.champions.includes(position)) {
       bgColor = 'bg-yellow-400 text-primary'
@@ -57,11 +63,13 @@ function PositionBadge({ position, highlights }: {
   }
 
   return (
-    <span className={`
+    <span
+      className={`
       w-8 h-8 flex items-center justify-center
       font-bold text-sm rounded-lg
       ${bgColor}
-    `}>
+    `}
+    >
       {position}
     </span>
   )
@@ -72,9 +80,7 @@ export default function StandingsTable({ standings, highlightPositions }: Standi
     <div className="bg-white border border-editorial rounded-lg overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-editorial bg-secondary/30">
-        <h2 className="font-editorial text-xl font-bold text-primary">
-          Classement
-        </h2>
+        <h2 className="font-editorial text-xl font-bold text-primary">Classement</h2>
       </div>
 
       {/* Table */}
@@ -120,25 +126,21 @@ export default function StandingsTable({ standings, highlightPositions }: Standi
           <tbody className="divide-y divide-editorial">
             {standings.map((row) => {
               const teamSlug = getTeamSlug(row.team.name)
-              
+
               return (
-                <tr 
-                  key={row.id} 
-                  className="hover:bg-secondary/30 transition-colors"
-                >
+                <tr key={row.id} className="hover:bg-secondary/30 transition-colors">
                   <td className="px-4 py-3">
-                    <PositionBadge 
-                      position={row.position} 
-                      highlights={highlightPositions}
-                    />
+                    <PositionBadge position={row.position} highlights={highlightPositions} />
                   </td>
                   <td className="px-4 py-3">
-                    <Link 
-                      href={`/team/${teamSlug}`}
-                      className="flex items-center gap-3 group/team"
-                    >
-                      <span className="w-8 h-8 flex items-center justify-center text-xl group-hover/team:scale-110 transition-transform">
-                        {row.team.logo}
+                    <Link href={`/team/${teamSlug}`} className="flex items-center gap-3 group/team">
+                      <span className="w-8 h-8 flex items-center justify-center group-hover/team:scale-110 transition-transform">
+                        <TeamLogo
+                          logoUrl={row.team.logoUrl}
+                          logo={row.team.logo}
+                          name={row.team.name}
+                          size="sm"
+                        />
                       </span>
                       <div>
                         <span className="font-semibold text-primary block group-hover/team:text-accent-sport transition-colors">
@@ -150,9 +152,7 @@ export default function StandingsTable({ standings, highlightPositions }: Standi
                       </div>
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-center text-primary font-medium">
-                    {row.played}
-                  </td>
+                  <td className="px-4 py-3 text-center text-primary font-medium">{row.played}</td>
                   <td className="px-4 py-3 text-center text-primary hidden sm:table-cell">
                     {row.won}
                   </td>
@@ -169,14 +169,21 @@ export default function StandingsTable({ standings, highlightPositions }: Standi
                     {row.goalsAgainst}
                   </td>
                   <td className="px-4 py-3 text-center font-semibold hidden lg:table-cell">
-                    <span className={row.goalDifference > 0 ? 'text-accent-live' : row.goalDifference < 0 ? 'text-red-500' : 'text-muted'}>
-                      {row.goalDifference > 0 ? '+' : ''}{row.goalDifference}
+                    <span
+                      className={
+                        row.goalDifference > 0
+                          ? 'text-accent-live'
+                          : row.goalDifference < 0
+                            ? 'text-red-500'
+                            : 'text-muted'
+                      }
+                    >
+                      {row.goalDifference > 0 ? '+' : ''}
+                      {row.goalDifference}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="font-bold text-lg text-primary">
-                      {row.points}
-                    </span>
+                    <span className="font-bold text-lg text-primary">{row.points}</span>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <div className="flex items-center justify-center gap-1">

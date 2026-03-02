@@ -1,8 +1,11 @@
 'use client'
 
+import TeamLogo from '@/components/ui/TeamLogo'
+
 interface TeamStats {
   name: string
   logo: string
+  logoUrl?: string
   possession: number
   shots: number
   shotsOnTarget: number
@@ -38,20 +41,26 @@ function StatRow({ label, homeValue, awayValue, isPercentage, highlight }: StatR
   return (
     <div className="py-4">
       <div className="flex items-center justify-between mb-2">
-        <span className={`font-semibold ${highlight && homeNum > awayNum ? 'text-accent-live' : 'text-primary'}`}>
-          {homeValue}{isPercentage ? '%' : ''}
+        <span
+          className={`font-semibold ${highlight && homeNum > awayNum ? 'text-accent-live' : 'text-primary'}`}
+        >
+          {homeValue}
+          {isPercentage ? '%' : ''}
         </span>
         <span className="text-sm text-muted uppercase tracking-wider">{label}</span>
-        <span className={`font-semibold ${highlight && awayNum > homeNum ? 'text-accent-live' : 'text-primary'}`}>
-          {awayValue}{isPercentage ? '%' : ''}
+        <span
+          className={`font-semibold ${highlight && awayNum > homeNum ? 'text-accent-live' : 'text-primary'}`}
+        >
+          {awayValue}
+          {isPercentage ? '%' : ''}
         </span>
       </div>
       <div className="flex h-2 rounded-full overflow-hidden bg-secondary">
-        <div 
+        <div
           className="bg-accent-sport transition-all duration-500"
           style={{ width: `${homePercent}%` }}
         />
-        <div 
+        <div
           className="bg-accent-mvp transition-all duration-500"
           style={{ width: `${awayPercent}%` }}
         />
@@ -73,63 +82,52 @@ export default function MatchStats({ homeTeam, awayTeam }: MatchStatsProps) {
       {/* Team Headers */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-editorial">
         <div className="flex items-center gap-3">
-          <span className="w-10 h-10 bg-accent-sport/10 rounded-full flex items-center justify-center text-2xl">
-            {homeTeam.logo}
+          <span className="w-10 h-10 bg-accent-sport/10 rounded-full flex items-center justify-center">
+            <TeamLogo
+              logoUrl={homeTeam.logoUrl}
+              logo={homeTeam.logo}
+              name={homeTeam.name}
+              size="sm"
+            />
           </span>
           <span className="font-semibold text-primary">{homeTeam.name}</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="font-semibold text-primary">{awayTeam.name}</span>
-          <span className="w-10 h-10 bg-accent-mvp/10 rounded-full flex items-center justify-center text-2xl">
-            {awayTeam.logo}
+          <span className="w-10 h-10 bg-accent-mvp/10 rounded-full flex items-center justify-center">
+            <TeamLogo
+              logoUrl={awayTeam.logoUrl}
+              logo={awayTeam.logo}
+              name={awayTeam.name}
+              size="sm"
+            />
           </span>
         </div>
       </div>
 
       {/* Stats */}
       <div className="px-6 divide-y divide-editorial">
-        <StatRow 
-          label="Possession" 
-          homeValue={homeTeam.possession} 
+        <StatRow
+          label="Possession"
+          homeValue={homeTeam.possession}
           awayValue={awayTeam.possession}
           isPercentage
           highlight
         />
-        <StatRow 
-          label="Tirs" 
-          homeValue={homeTeam.shots} 
-          awayValue={awayTeam.shots}
-          highlight
-        />
-        <StatRow 
-          label="Tirs cadrés" 
-          homeValue={homeTeam.shotsOnTarget} 
+        <StatRow label="Tirs" homeValue={homeTeam.shots} awayValue={awayTeam.shots} highlight />
+        <StatRow
+          label="Tirs cadrés"
+          homeValue={homeTeam.shotsOnTarget}
           awayValue={awayTeam.shotsOnTarget}
           highlight
         />
-        <StatRow 
-          label="Corners" 
-          homeValue={homeTeam.corners} 
-          awayValue={awayTeam.corners}
-        />
-        <StatRow 
-          label="Fautes" 
-          homeValue={homeTeam.fouls} 
-          awayValue={awayTeam.fouls}
-        />
-        <StatRow 
-          label="Hors-jeu" 
-          homeValue={homeTeam.offsides} 
-          awayValue={awayTeam.offsides}
-        />
-        <StatRow 
-          label="Passes" 
-          homeValue={homeTeam.passes} 
-          awayValue={awayTeam.passes}
-        />
-        <StatRow 
-          label="Précision passes" 
-          homeValue={homeTeam.passAccuracy} 
+        <StatRow label="Corners" homeValue={homeTeam.corners} awayValue={awayTeam.corners} />
+        <StatRow label="Fautes" homeValue={homeTeam.fouls} awayValue={awayTeam.fouls} />
+        <StatRow label="Hors-jeu" homeValue={homeTeam.offsides} awayValue={awayTeam.offsides} />
+        <StatRow label="Passes" homeValue={homeTeam.passes} awayValue={awayTeam.passes} />
+        <StatRow
+          label="Précision passes"
+          homeValue={homeTeam.passAccuracy}
           awayValue={awayTeam.passAccuracy}
           isPercentage
         />
